@@ -1,0 +1,155 @@
+Oct-24 14:49:43.090 [main] DEBUG nextflow.cli.Launcher - $> nextflow ../main.nf --ont_reads_fq '/scratch/mteb223/PIPSeq/mouseBrain/test_corrected/*.fastq' --ref ../../references/Homo_sapiens.GRCh38_ERCC.fa --annotation ../../references/Homo_sapiens.GRCh38.107_ERCC.gtf --housekeeping ../../references/hg38.HouseKeepingGenes.bed --cdna_kit PCS111 --out_dir ./test_results/ --is_discovery False --bambu_track_reads True --mapq 10 --step 2 --is_chm13 False -resume
+Oct-24 14:49:43.553 [main] INFO  nextflow.cli.CmdRun - N E X T F L O W  ~  version 23.04.3
+Oct-24 14:49:43.565 [main] DEBUG nextflow.plugin.PluginsFacade - Setting up plugin manager > mode=prod; embedded=false; plugins-dir=/home/bag222/.nextflow/plugins; core-plugins: nf-amazon@1.16.2,nf-azure@1.0.1,nf-codecommit@0.1.4,nf-console@1.0.5,nf-ga4gh@1.0.5,nf-google@1.7.3,nf-tower@1.5.12,nf-wave@0.8.4
+Oct-24 14:49:43.583 [main] INFO  org.pf4j.DefaultPluginStatusProvider - Enabled plugins: []
+Oct-24 14:49:43.584 [main] INFO  org.pf4j.DefaultPluginStatusProvider - Disabled plugins: []
+Oct-24 14:49:43.586 [main] INFO  org.pf4j.DefaultPluginManager - PF4J version 3.4.1 in 'deployment' mode
+Oct-24 14:49:43.593 [main] INFO  org.pf4j.AbstractPluginManager - No plugins
+Oct-24 14:49:43.605 [main] DEBUG nextflow.config.ConfigBuilder - Found config base: /pscratch/mteb223_uksr/single_cell_pipeline_test/cDNA_pipeline_single_cell/workflow/nextflow.config
+Oct-24 14:49:43.606 [main] DEBUG nextflow.config.ConfigBuilder - Parsing config file: /pscratch/mteb223_uksr/single_cell_pipeline_test/cDNA_pipeline_single_cell/workflow/nextflow.config
+Oct-24 14:49:43.623 [main] DEBUG nextflow.config.ConfigBuilder - Applying config profile: `standard`
+Oct-24 14:49:44.052 [main] DEBUG nextflow.cli.CmdRun - Applied DSL=2 from script declararion
+Oct-24 14:49:44.065 [main] INFO  nextflow.cli.CmdRun - Launching `../main.nf` [sick_hamilton] DSL2 - revision: 3cf0b47597
+Oct-24 14:49:44.065 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins default=[]
+Oct-24 14:49:44.065 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins resolved requirement=[]
+Oct-24 14:49:44.071 [main] DEBUG nextflow.secret.LocalSecretsProvider - Secrets store: /home/bag222/.nextflow/secrets/store.json
+Oct-24 14:49:44.073 [main] DEBUG nextflow.secret.SecretsLoader - Discovered secrets providers: [nextflow.secret.LocalSecretsProvider@2370ac7a] - activable => nextflow.secret.LocalSecretsProvider@2370ac7a
+Oct-24 14:49:44.119 [main] DEBUG nextflow.Session - Session UUID: 7a27c050-d1af-4396-a970-9e3492f4fb5d
+Oct-24 14:49:44.119 [main] DEBUG nextflow.Session - Run name: sick_hamilton
+Oct-24 14:49:44.120 [main] DEBUG nextflow.Session - Executor pool size: 64
+Oct-24 14:49:44.131 [main] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'FileTransfer' minSize=10; maxSize=192; workQueue=LinkedBlockingQueue[10000]; allowCoreThreadTimeout=false
+Oct-24 14:49:44.151 [main] DEBUG nextflow.cli.CmdRun - 
+  Version: 23.04.3 build 5875
+  Created: 11-08-2023 18:37 UTC (14:37 EDT)
+  System: Linux 4.18.0-305.10.2.el8_4.x86_64
+  Runtime: Groovy 3.0.16 on Java HotSpot(TM) 64-Bit Server VM 19.0.2+7-44
+  Encoding: UTF-8 (ANSI_X3.4-1968)
+  Process: 2016414@mcc-login002 [10.30.4.31]
+  CPUs: 64 - Mem: 251.5 GB (209.3 GB) - Swap: 44.7 GB (34.8 GB)
+Oct-24 14:49:44.173 [main] DEBUG nextflow.Session - Work-dir: /pscratch/mteb223_uksr/single_cell_pipeline_test/cDNA_pipeline_single_cell/workflow/submission/work [gpfs]
+Oct-24 14:49:44.186 [main] DEBUG nextflow.executor.ExecutorFactory - Extension executors providers=[]
+Oct-24 14:49:44.192 [main] DEBUG nextflow.Session - Observer factory: DefaultObserverFactory
+Oct-24 14:49:44.213 [main] DEBUG nextflow.cache.CacheFactory - Using Nextflow cache factory: nextflow.cache.DefaultCacheFactory
+Oct-24 14:49:44.220 [main] DEBUG nextflow.util.CustomThreadPool - Creating default thread pool > poolSize: 65; maxThreads: 1000
+Oct-24 14:49:44.568 [main] DEBUG nextflow.Session - Session start
+Oct-24 14:49:44.766 [main] DEBUG nextflow.script.ScriptRunner - > Launching execution
+Oct-24 14:49:44.776 [main] INFO  nextflow.Nextflow - 
+   OXFORD NANOPORE cDNA SEQUENCING PIPELINE - Bernardo Aguzzoli Heberle - EBBERT LAB - University of Kentucky
+ ==============================================================================================================
+ nanopore fastq files                                           : /scratch/mteb223/PIPSeq/mouseBrain/test_corrected/*.fastq
+ nanopore sequencing summary files                              : None
+ reference genome                                               : ../../references/Homo_sapiens.GRCh38_ERCC.fa
+ reference annotation                                           : ../../references/Homo_sapiens.GRCh38.107_ERCC.gtf
+ housekeeping genes 3' bias assessment                          : ../../references/hg38.HouseKeepingGenes.bed
+ nanopore library prep kit                                      : PCS111
+ multiqc configuration file                                     : None
+
+ reference genome is CHM13                                      : false
+ transcript discovery status                                    : false
+
+ nanopore fast5 files (basecall only)                           : None
+ nanopore basecall config (basecall only)                       : None
+ nanopore basecall id (basecall only)                           : None
+
+ NDR Value for Bambu (Novel Discovery Rate)                     : auto
+ Track read_ids with bambu?                                     : False
+
+ MAPQ value for filtering bam file                              : 10
+
+ Step: 1 = basecalling, 2 = mapping, 3 = quantification         : 2
+
+ Path to pre-processed bambu RDS files                          : None
+ Path to QC files that go into MultiQC report                   : None   
+
+ Is this a direct RNAseq dataset?                               : False
+
+ Reference for contamination analysis                           : None
+ ==============================================================================================================
+ 
+Oct-24 14:49:46.874 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:tiny` matches labels `tiny` for process with name NANOPORE_cDNA_STEP_2:MAKE_FAI
+Oct-24 14:49:46.876 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:(MAP_CONTAMINATION_dRNA|MAP_CONTAMINATION_cDNA|GFFCOMPARE|MAKE_INDEX_cDNA|MAKE_INDEX_dRNA|MINIMAP2_cDNA|MINIMAP2_dRNA|MINIMAP2_QC|FILTER_BAM|PYCHOPPER|STRINGTIE_ONT_cDNA|MAKE_FAI|MAKE_TRANSCRIPTOME|MAKE_INDEX_cDNA_CONTAMINATION_CHM13|MAKE_INDEX_dRNA_CONTAMINATION_CHM13)` matches process NANOPORE_cDNA_STEP_2:MAKE_FAI
+Oct-24 14:49:46.879 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Oct-24 14:49:46.879 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Oct-24 14:49:46.886 [main] DEBUG nextflow.executor.Executor - [warm up] executor > slurm
+Oct-24 14:49:46.890 [main] DEBUG n.processor.TaskPollingMonitor - Creating task monitor for executor 'slurm' > capacity: 300; pollInterval: 5s; dumpInterval: 5m 
+Oct-24 14:49:46.892 [main] DEBUG n.executor.AbstractGridExecutor - Creating executor 'slurm' > queue-stat-interval: 1m
+Oct-24 14:49:46.934 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:large` matches labels `large` for process with name NANOPORE_cDNA_STEP_2:MAKE_INDEX_cDNA
+Oct-24 14:49:46.935 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:(MAP_CONTAMINATION_dRNA|MAP_CONTAMINATION_cDNA|GFFCOMPARE|MAKE_INDEX_cDNA|MAKE_INDEX_dRNA|MINIMAP2_cDNA|MINIMAP2_dRNA|MINIMAP2_QC|FILTER_BAM|PYCHOPPER|STRINGTIE_ONT_cDNA|MAKE_FAI|MAKE_TRANSCRIPTOME|MAKE_INDEX_cDNA_CONTAMINATION_CHM13|MAKE_INDEX_dRNA_CONTAMINATION_CHM13)` matches process NANOPORE_cDNA_STEP_2:MAKE_INDEX_cDNA
+Oct-24 14:49:46.935 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Oct-24 14:49:46.935 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Oct-24 14:49:46.945 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:tiny` matches labels `tiny` for process with name NANOPORE_cDNA_STEP_2:PYCHOPPER
+Oct-24 14:49:46.945 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:(MAP_CONTAMINATION_dRNA|MAP_CONTAMINATION_cDNA|GFFCOMPARE|MAKE_INDEX_cDNA|MAKE_INDEX_dRNA|MINIMAP2_cDNA|MINIMAP2_dRNA|MINIMAP2_QC|FILTER_BAM|PYCHOPPER|STRINGTIE_ONT_cDNA|MAKE_FAI|MAKE_TRANSCRIPTOME|MAKE_INDEX_cDNA_CONTAMINATION_CHM13|MAKE_INDEX_dRNA_CONTAMINATION_CHM13)` matches process NANOPORE_cDNA_STEP_2:PYCHOPPER
+Oct-24 14:49:46.946 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Oct-24 14:49:46.946 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Oct-24 14:49:46.951 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:tiny` matches labels `tiny` for process with name NANOPORE_cDNA_STEP_2:MINIMAP2_cDNA
+Oct-24 14:49:46.952 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:(MAP_CONTAMINATION_dRNA|MAP_CONTAMINATION_cDNA|GFFCOMPARE|MAKE_INDEX_cDNA|MAKE_INDEX_dRNA|MINIMAP2_cDNA|MINIMAP2_dRNA|MINIMAP2_QC|FILTER_BAM|PYCHOPPER|STRINGTIE_ONT_cDNA|MAKE_FAI|MAKE_TRANSCRIPTOME|MAKE_INDEX_cDNA_CONTAMINATION_CHM13|MAKE_INDEX_dRNA_CONTAMINATION_CHM13)` matches process NANOPORE_cDNA_STEP_2:MINIMAP2_cDNA
+Oct-24 14:49:46.952 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Oct-24 14:49:46.952 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Oct-24 14:49:46.955 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:tiny` matches labels `tiny` for process with name NANOPORE_cDNA_STEP_2:FILTER_BAM
+Oct-24 14:49:46.955 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:(MAP_CONTAMINATION_dRNA|MAP_CONTAMINATION_cDNA|GFFCOMPARE|MAKE_INDEX_cDNA|MAKE_INDEX_dRNA|MINIMAP2_cDNA|MINIMAP2_dRNA|MINIMAP2_QC|FILTER_BAM|PYCHOPPER|STRINGTIE_ONT_cDNA|MAKE_FAI|MAKE_TRANSCRIPTOME|MAKE_INDEX_cDNA_CONTAMINATION_CHM13|MAKE_INDEX_dRNA_CONTAMINATION_CHM13)` matches process NANOPORE_cDNA_STEP_2:FILTER_BAM
+Oct-24 14:49:46.956 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Oct-24 14:49:46.956 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Oct-24 14:49:46.959 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:bambu_prep_job` matches labels `bambu_prep_job` for process with name NANOPORE_cDNA_STEP_2:BAMBU_PREP
+Oct-24 14:49:46.959 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:(BAMBU_PREP|BAMBU_DISCOVERY|BAMBU_QUANT)` matches process NANOPORE_cDNA_STEP_2:BAMBU_PREP
+Oct-24 14:49:46.959 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Oct-24 14:49:46.959 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Oct-24 14:49:46.962 [main] DEBUG nextflow.Session - Workflow process names [dsl2]: FILTER_BAM_ONLY, NANOPORE_cDNA_STEP_2:MAKE_INDEX_cDNA, MULTIQC_CHM13, PYCHOPPER, MINIMAP2_cDNA, NANOPORE_cDNA_STEP_2:BAMBU_PREP, GFFCOMPARE, FILTER_BAM, BAMBU_QUANT, GATHER_BASECALL, MAKE_INDEX_cDNA_CONTAMINATION_CHM13, MAKE_CONTAMINATION_REPORT_2, PYCOQC, MAKE_CONTAMINATION_REPORT_1, MAP_CONTAMINATION_cDNA, MAKE_INDEX_dRNA, RSEQC, NANOPORE_cDNA_STEP_2:MINIMAP2_cDNA, PYCOQC_dRNA, MAKE_TRANSCRIPTOME, CHM13_GTF_ERCC, MAP_CONTAMINATION_dRNA, MAKE_INDEX_dRNA_CONTAMINATION_CHM13, MULTIQC_GRCh38, CHM13_GTF, MINIMAP2_dRNA, BAMBU_DISCOVERY, NANOPORE_cDNA_STEP_2:PYCHOPPER, BAMBU_PREP, MAKE_INDEX_cDNA, MAKE_INDEX_CONTAMINANTS, NANOPORE_cDNA_STEP_2:FILTER_BAM, MAKE_FAI, BASECALL, NANOPORE_cDNA_STEP_2:MAKE_FAI
+Oct-24 14:49:46.962 [main] DEBUG nextflow.Session - Igniting dataflow network (22)
+Oct-24 14:49:46.966 [PathVisitor-1] DEBUG nextflow.file.PathVisitor - files for syntax: glob; folder: /scratch/mteb223/PIPSeq/mouseBrain/test_corrected/; pattern: *.fastq; options: [:]
+Oct-24 14:49:46.967 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NANOPORE_cDNA_STEP_2:MAKE_FAI
+Oct-24 14:49:46.967 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NANOPORE_cDNA_STEP_2:MAKE_INDEX_cDNA
+Oct-24 14:49:46.968 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NANOPORE_cDNA_STEP_2:PYCHOPPER
+Oct-24 14:49:46.968 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NANOPORE_cDNA_STEP_2:MINIMAP2_cDNA
+Oct-24 14:49:46.968 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NANOPORE_cDNA_STEP_2:FILTER_BAM
+Oct-24 14:49:46.968 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NANOPORE_cDNA_STEP_2:BAMBU_PREP
+Oct-24 14:49:46.968 [main] DEBUG nextflow.script.ScriptRunner - > Awaiting termination 
+Oct-24 14:49:46.968 [main] DEBUG nextflow.Session - Session await
+Oct-24 14:49:46.974 [PathVisitor-1] ERROR nextflow.Channel - /scratch/mteb223/PIPSeq/mouseBrain/test_corrected
+java.nio.file.AccessDeniedException: /scratch/mteb223/PIPSeq/mouseBrain/test_corrected
+	at java.base/sun.nio.fs.UnixException.translateToIOException(UnixException.java:90)
+	at java.base/sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:106)
+	at java.base/sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:111)
+	at java.base/sun.nio.fs.UnixFileAttributeViews$Basic.readAttributes(UnixFileAttributeViews.java:55)
+	at java.base/sun.nio.fs.UnixFileSystemProvider.readAttributes(UnixFileSystemProvider.java:148)
+	at java.base/sun.nio.fs.LinuxFileSystemProvider.readAttributes(LinuxFileSystemProvider.java:99)
+	at java.base/java.nio.file.Files.readAttributes(Files.java:1849)
+	at java.base/java.nio.file.FileTreeWalker.getAttributes(FileTreeWalker.java:226)
+	at java.base/java.nio.file.FileTreeWalker.visit(FileTreeWalker.java:277)
+	at java.base/java.nio.file.FileTreeWalker.walk(FileTreeWalker.java:323)
+	at java.base/java.nio.file.Files.walkFileTree(Files.java:2803)
+	at nextflow.file.FileHelper.visitFiles(FileHelper.groovy:825)
+	at nextflow.file.PathVisitor.pathImpl(PathVisitor.groovy:162)
+	at nextflow.file.PathVisitor.applyGlobPattern0(PathVisitor.groovy:130)
+	at nextflow.file.PathVisitor.apply(PathVisitor.groovy:68)
+	at nextflow.file.PathVisitor$_applyAsync_closure1.doCall(PathVisitor.groovy:77)
+	at nextflow.file.PathVisitor$_applyAsync_closure1.call(PathVisitor.groovy)
+	at groovy.lang.Closure.run(Closure.java:493)
+	at java.base/java.util.concurrent.CompletableFuture$UniRun.tryFire(CompletableFuture.java:787)
+	at java.base/java.util.concurrent.CompletableFuture$Completion.run(CompletableFuture.java:482)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1589)
+Oct-24 14:49:47.410 [PathVisitor-1] DEBUG nextflow.Session - Session aborted -- Cause: /scratch/mteb223/PIPSeq/mouseBrain/test_corrected
+Oct-24 14:49:47.422 [PathVisitor-1] DEBUG nextflow.Session - The following nodes are still active:
+[process] NANOPORE_cDNA_STEP_2:MAKE_FAI
+  status=ACTIVE
+  port 0: (value) bound ; channel: ref
+  port 1: (cntrl) -     ; channel: $
+
+[process] NANOPORE_cDNA_STEP_2:MAKE_INDEX_cDNA
+  status=ACTIVE
+  port 0: (value) bound ; channel: ref
+  port 1: (cntrl) -     ; channel: $
+
+Oct-24 14:49:47.424 [main] DEBUG nextflow.Session - Session await > all processes finished
+Oct-24 14:49:47.424 [main] DEBUG nextflow.Session - Session await > all barriers passed
+Oct-24 14:49:47.425 [Actor Thread 8] DEBUG nextflow.processor.TaskProcessor - Handling unexpected condition for
+  task: name=NANOPORE_cDNA_STEP_2:MAKE_INDEX_cDNA; work-dir=null
+  error [java.lang.InterruptedException]: java.lang.InterruptedException
+Oct-24 14:49:47.425 [Actor Thread 7] DEBUG nextflow.processor.TaskProcessor - Handling unexpected condition for
+  task: name=NANOPORE_cDNA_STEP_2:MAKE_FAI; work-dir=null
+  error [java.lang.InterruptedException]: java.lang.InterruptedException
+Oct-24 14:49:47.427 [main] DEBUG nextflow.trace.WorkflowStatsObserver - Workflow completed > WorkflowStats[succeededCount=0; failedCount=0; ignoredCount=0; cachedCount=0; pendingCount=0; submittedCount=0; runningCount=0; retriesCount=0; abortedCount=0; succeedDuration=0ms; failedDuration=0ms; cachedDuration=0ms;loadCpus=0; loadMemory=0; peakRunning=0; peakCpus=0; peakMemory=0; ]
+Oct-24 14:49:47.439 [Actor Thread 31] DEBUG nextflow.container.SingularityCache - Singularity found local store for image=library://ebbertlab/nanopore_cdna/nanopore:sha256.1e78cf38407f51f1742a996adcb6bed9019e103ffd830fa210fa0194014b5064; path=/scratch/bag222/miscelaneous/singularity_cache/ebbertlab-nanopore_cdna-nanopore-sha256.1e78cf38407f51f1742a996adcb6bed9019e103ffd830fa210fa0194014b5064.img
+Oct-24 14:49:47.663 [main] DEBUG nextflow.cache.CacheDB - Closing CacheDB done
+Oct-24 14:49:47.673 [main] DEBUG nextflow.script.ScriptRunner - > Execution complete -- Goodbye

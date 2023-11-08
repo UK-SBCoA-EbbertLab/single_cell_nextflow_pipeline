@@ -1,0 +1,377 @@
+Oct-24 14:37:04.925 [main] DEBUG nextflow.cli.Launcher - $> nextflow ../main.nf --ont_reads_fq '/scratch/mteb223/PIPSeq/mouseBrain/test/*.fastq' --ref ../../references/Homo_sapiens.GRCh38_ERCC.fa --annotation ../../references/Homo_sapiens.GRCh38.107_ERCC.gtf --housekeeping ../../references/hg38.HouseKeepingGenes.bed --cdna_kit PCS111 --out_dir ./test_corrected/ --is_discovery False --bambu_track_reads True --mapq 10 --step 2 --is_chm13 False -resume
+Oct-24 14:37:05.028 [main] INFO  nextflow.cli.CmdRun - N E X T F L O W  ~  version 23.04.3
+Oct-24 14:37:05.056 [main] DEBUG nextflow.plugin.PluginsFacade - Setting up plugin manager > mode=prod; embedded=false; plugins-dir=/home/mteb223/.nextflow/plugins; core-plugins: nf-amazon@1.16.2,nf-azure@1.0.1,nf-codecommit@0.1.4,nf-console@1.0.5,nf-ga4gh@1.0.5,nf-google@1.7.3,nf-tower@1.5.12,nf-wave@0.8.4
+Oct-24 14:37:05.064 [main] INFO  org.pf4j.DefaultPluginStatusProvider - Enabled plugins: []
+Oct-24 14:37:05.065 [main] INFO  org.pf4j.DefaultPluginStatusProvider - Disabled plugins: []
+Oct-24 14:37:05.067 [main] INFO  org.pf4j.DefaultPluginManager - PF4J version 3.4.1 in 'deployment' mode
+Oct-24 14:37:05.075 [main] INFO  org.pf4j.AbstractPluginManager - No plugins
+Oct-24 14:37:05.090 [main] DEBUG nextflow.config.ConfigBuilder - Found config base: /pscratch/mteb223_uksr/single_cell_pipeline_test/cDNA_pipeline_single_cell/workflow/nextflow.config
+Oct-24 14:37:05.091 [main] DEBUG nextflow.config.ConfigBuilder - Parsing config file: /pscratch/mteb223_uksr/single_cell_pipeline_test/cDNA_pipeline_single_cell/workflow/nextflow.config
+Oct-24 14:37:05.110 [main] DEBUG nextflow.config.ConfigBuilder - Applying config profile: `standard`
+Oct-24 14:37:05.683 [main] DEBUG nextflow.cli.CmdRun - Applied DSL=2 from script declararion
+Oct-24 14:37:05.696 [main] INFO  nextflow.cli.CmdRun - Launching `../main.nf` [berserk_chandrasekhar] DSL2 - revision: 3cf0b47597
+Oct-24 14:37:05.697 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins default=[]
+Oct-24 14:37:05.697 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins resolved requirement=[]
+Oct-24 14:37:05.703 [main] DEBUG nextflow.secret.LocalSecretsProvider - Secrets store: /home/mteb223/.nextflow/secrets/store.json
+Oct-24 14:37:05.706 [main] DEBUG nextflow.secret.SecretsLoader - Discovered secrets providers: [nextflow.secret.LocalSecretsProvider@6a12c7a8] - activable => nextflow.secret.LocalSecretsProvider@6a12c7a8
+Oct-24 14:37:05.758 [main] DEBUG nextflow.Session - Session UUID: 7a27c050-d1af-4396-a970-9e3492f4fb5d
+Oct-24 14:37:05.759 [main] DEBUG nextflow.Session - Run name: berserk_chandrasekhar
+Oct-24 14:37:05.759 [main] DEBUG nextflow.Session - Executor pool size: 64
+Oct-24 14:37:05.767 [main] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'FileTransfer' minSize=10; maxSize=192; workQueue=LinkedBlockingQueue[10000]; allowCoreThreadTimeout=false
+Oct-24 14:37:05.781 [main] DEBUG nextflow.cli.CmdRun - 
+  Version: 23.04.3 build 5875
+  Created: 11-08-2023 18:37 UTC (14:37 EDT)
+  System: Linux 4.18.0-305.10.2.el8_4.x86_64
+  Runtime: Groovy 3.0.16 on Java HotSpot(TM) 64-Bit Server VM 11.0.2+9-LTS
+  Encoding: UTF-8 (UTF-8)
+  Process: 1300821@mcc-login001 [10.30.4.30]
+  CPUs: 64 - Mem: 251.5 GB (18.8 GB) - Swap: 44.7 GB (34.2 GB)
+Oct-24 14:37:05.801 [main] DEBUG nextflow.Session - Work-dir: /scratch/mteb223 [gpfs]
+Oct-24 14:37:05.813 [main] DEBUG nextflow.executor.ExecutorFactory - Extension executors providers=[]
+Oct-24 14:37:05.820 [main] DEBUG nextflow.Session - Observer factory: DefaultObserverFactory
+Oct-24 14:37:05.843 [main] DEBUG nextflow.cache.CacheFactory - Using Nextflow cache factory: nextflow.cache.DefaultCacheFactory
+Oct-24 14:37:05.851 [main] DEBUG nextflow.util.CustomThreadPool - Creating default thread pool > poolSize: 65; maxThreads: 1000
+Oct-24 14:37:05.986 [main] DEBUG nextflow.Session - Session start
+Oct-24 14:37:06.273 [main] DEBUG nextflow.script.ScriptRunner - > Launching execution
+Oct-24 14:37:06.285 [main] INFO  nextflow.Nextflow - 
+   OXFORD NANOPORE cDNA SEQUENCING PIPELINE - Bernardo Aguzzoli Heberle - EBBERT LAB - University of Kentucky
+ ==============================================================================================================
+ nanopore fastq files                                           : /scratch/mteb223/PIPSeq/mouseBrain/test/*.fastq
+ nanopore sequencing summary files                              : None
+ reference genome                                               : ../../references/Homo_sapiens.GRCh38_ERCC.fa
+ reference annotation                                           : ../../references/Homo_sapiens.GRCh38.107_ERCC.gtf
+ housekeeping genes 3' bias assessment                          : ../../references/hg38.HouseKeepingGenes.bed
+ nanopore library prep kit                                      : PCS111
+ multiqc configuration file                                     : None
+
+ reference genome is CHM13                                      : false
+ transcript discovery status                                    : false
+
+ nanopore fast5 files (basecall only)                           : None
+ nanopore basecall config (basecall only)                       : None
+ nanopore basecall id (basecall only)                           : None
+
+ NDR Value for Bambu (Novel Discovery Rate)                     : auto
+ Track read_ids with bambu?                                     : False
+
+ MAPQ value for filtering bam file                              : 10
+
+ Step: 1 = basecalling, 2 = mapping, 3 = quantification         : 2
+
+ Path to pre-processed bambu RDS files                          : None
+ Path to QC files that go into MultiQC report                   : None   
+
+ Is this a direct RNAseq dataset?                               : False
+
+ Reference for contamination analysis                           : None
+ ==============================================================================================================
+ 
+Oct-24 14:37:08.749 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:tiny` matches labels `tiny` for process with name NANOPORE_cDNA_STEP_2:MAKE_FAI
+Oct-24 14:37:08.751 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:(MAP_CONTAMINATION_dRNA|MAP_CONTAMINATION_cDNA|GFFCOMPARE|MAKE_INDEX_cDNA|MAKE_INDEX_dRNA|MINIMAP2_cDNA|MINIMAP2_dRNA|MINIMAP2_QC|FILTER_BAM|PYCHOPPER|STRINGTIE_ONT_cDNA|MAKE_FAI|MAKE_TRANSCRIPTOME|MAKE_INDEX_cDNA_CONTAMINATION_CHM13|MAKE_INDEX_dRNA_CONTAMINATION_CHM13)` matches process NANOPORE_cDNA_STEP_2:MAKE_FAI
+Oct-24 14:37:08.754 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Oct-24 14:37:08.754 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Oct-24 14:37:08.762 [main] DEBUG nextflow.executor.Executor - [warm up] executor > slurm
+Oct-24 14:37:08.767 [main] DEBUG n.processor.TaskPollingMonitor - Creating task monitor for executor 'slurm' > capacity: 300; pollInterval: 5s; dumpInterval: 5m 
+Oct-24 14:37:08.770 [main] DEBUG n.executor.AbstractGridExecutor - Creating executor 'slurm' > queue-stat-interval: 1m
+Oct-24 14:37:08.819 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:large` matches labels `large` for process with name NANOPORE_cDNA_STEP_2:MAKE_INDEX_cDNA
+Oct-24 14:37:08.820 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:(MAP_CONTAMINATION_dRNA|MAP_CONTAMINATION_cDNA|GFFCOMPARE|MAKE_INDEX_cDNA|MAKE_INDEX_dRNA|MINIMAP2_cDNA|MINIMAP2_dRNA|MINIMAP2_QC|FILTER_BAM|PYCHOPPER|STRINGTIE_ONT_cDNA|MAKE_FAI|MAKE_TRANSCRIPTOME|MAKE_INDEX_cDNA_CONTAMINATION_CHM13|MAKE_INDEX_dRNA_CONTAMINATION_CHM13)` matches process NANOPORE_cDNA_STEP_2:MAKE_INDEX_cDNA
+Oct-24 14:37:08.820 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Oct-24 14:37:08.820 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Oct-24 14:37:08.832 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:tiny` matches labels `tiny` for process with name NANOPORE_cDNA_STEP_2:PYCHOPPER
+Oct-24 14:37:08.832 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:(MAP_CONTAMINATION_dRNA|MAP_CONTAMINATION_cDNA|GFFCOMPARE|MAKE_INDEX_cDNA|MAKE_INDEX_dRNA|MINIMAP2_cDNA|MINIMAP2_dRNA|MINIMAP2_QC|FILTER_BAM|PYCHOPPER|STRINGTIE_ONT_cDNA|MAKE_FAI|MAKE_TRANSCRIPTOME|MAKE_INDEX_cDNA_CONTAMINATION_CHM13|MAKE_INDEX_dRNA_CONTAMINATION_CHM13)` matches process NANOPORE_cDNA_STEP_2:PYCHOPPER
+Oct-24 14:37:08.833 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Oct-24 14:37:08.834 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Oct-24 14:37:08.840 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:tiny` matches labels `tiny` for process with name NANOPORE_cDNA_STEP_2:MINIMAP2_cDNA
+Oct-24 14:37:08.841 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:(MAP_CONTAMINATION_dRNA|MAP_CONTAMINATION_cDNA|GFFCOMPARE|MAKE_INDEX_cDNA|MAKE_INDEX_dRNA|MINIMAP2_cDNA|MINIMAP2_dRNA|MINIMAP2_QC|FILTER_BAM|PYCHOPPER|STRINGTIE_ONT_cDNA|MAKE_FAI|MAKE_TRANSCRIPTOME|MAKE_INDEX_cDNA_CONTAMINATION_CHM13|MAKE_INDEX_dRNA_CONTAMINATION_CHM13)` matches process NANOPORE_cDNA_STEP_2:MINIMAP2_cDNA
+Oct-24 14:37:08.841 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Oct-24 14:37:08.841 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Oct-24 14:37:08.846 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:tiny` matches labels `tiny` for process with name NANOPORE_cDNA_STEP_2:FILTER_BAM
+Oct-24 14:37:08.846 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:(MAP_CONTAMINATION_dRNA|MAP_CONTAMINATION_cDNA|GFFCOMPARE|MAKE_INDEX_cDNA|MAKE_INDEX_dRNA|MINIMAP2_cDNA|MINIMAP2_dRNA|MINIMAP2_QC|FILTER_BAM|PYCHOPPER|STRINGTIE_ONT_cDNA|MAKE_FAI|MAKE_TRANSCRIPTOME|MAKE_INDEX_cDNA_CONTAMINATION_CHM13|MAKE_INDEX_dRNA_CONTAMINATION_CHM13)` matches process NANOPORE_cDNA_STEP_2:FILTER_BAM
+Oct-24 14:37:08.847 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Oct-24 14:37:08.847 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Oct-24 14:37:08.852 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:bambu_prep_job` matches labels `bambu_prep_job` for process with name NANOPORE_cDNA_STEP_2:BAMBU_PREP
+Oct-24 14:37:08.852 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:(BAMBU_PREP|BAMBU_DISCOVERY|BAMBU_QUANT)` matches process NANOPORE_cDNA_STEP_2:BAMBU_PREP
+Oct-24 14:37:08.852 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: slurm
+Oct-24 14:37:08.852 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'slurm'
+Oct-24 14:37:08.856 [main] DEBUG nextflow.Session - Workflow process names [dsl2]: FILTER_BAM_ONLY, NANOPORE_cDNA_STEP_2:MAKE_INDEX_cDNA, MULTIQC_CHM13, MINIMAP2_cDNA, PYCHOPPER, NANOPORE_cDNA_STEP_2:BAMBU_PREP, GFFCOMPARE, FILTER_BAM, BAMBU_QUANT, GATHER_BASECALL, MAKE_INDEX_cDNA_CONTAMINATION_CHM13, MAKE_CONTAMINATION_REPORT_2, PYCOQC, MAKE_CONTAMINATION_REPORT_1, MAKE_INDEX_dRNA, MAP_CONTAMINATION_cDNA, RSEQC, NANOPORE_cDNA_STEP_2:MINIMAP2_cDNA, PYCOQC_dRNA, MAKE_TRANSCRIPTOME, CHM13_GTF_ERCC, MAP_CONTAMINATION_dRNA, MAKE_INDEX_dRNA_CONTAMINATION_CHM13, MULTIQC_GRCh38, CHM13_GTF, MINIMAP2_dRNA, BAMBU_DISCOVERY, NANOPORE_cDNA_STEP_2:PYCHOPPER, BAMBU_PREP, MAKE_INDEX_CONTAMINANTS, MAKE_INDEX_cDNA, NANOPORE_cDNA_STEP_2:FILTER_BAM, MAKE_FAI, BASECALL, NANOPORE_cDNA_STEP_2:MAKE_FAI
+Oct-24 14:37:08.857 [main] DEBUG nextflow.Session - Igniting dataflow network (22)
+Oct-24 14:37:08.861 [PathVisitor-1] DEBUG nextflow.file.PathVisitor - files for syntax: glob; folder: /scratch/mteb223/PIPSeq/mouseBrain/test/; pattern: *.fastq; options: [:]
+Oct-24 14:37:08.864 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NANOPORE_cDNA_STEP_2:MAKE_FAI
+Oct-24 14:37:08.865 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NANOPORE_cDNA_STEP_2:MAKE_INDEX_cDNA
+Oct-24 14:37:08.866 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NANOPORE_cDNA_STEP_2:PYCHOPPER
+Oct-24 14:37:08.866 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NANOPORE_cDNA_STEP_2:MINIMAP2_cDNA
+Oct-24 14:37:08.867 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NANOPORE_cDNA_STEP_2:FILTER_BAM
+Oct-24 14:37:08.868 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > NANOPORE_cDNA_STEP_2:BAMBU_PREP
+Oct-24 14:37:08.869 [main] DEBUG nextflow.script.ScriptRunner - > Awaiting termination 
+Oct-24 14:37:08.870 [main] DEBUG nextflow.Session - Session await
+Oct-24 14:37:08.945 [Actor Thread 20] DEBUG nextflow.container.SingularityCache - Singularity found local store for image=library://ebbertlab/nanopore_cdna/nanopore:sha256.1e78cf38407f51f1742a996adcb6bed9019e103ffd830fa210fa0194014b5064; path=/scratch/mteb223/singularity/ebbertlab-nanopore_cdna-nanopore-sha256.1e78cf38407f51f1742a996adcb6bed9019e103ffd830fa210fa0194014b5064.img
+Oct-24 14:37:09.211 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (16) > jobId: 16859864; workDir: /scratch/mteb223/fb/e179e9cd743f2bc53f13ddd5d0a4f7
+Oct-24 14:37:09.211 [Task submitter] INFO  nextflow.Session - [fb/e179e9] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (16)
+Oct-24 14:37:09.229 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (62) > jobId: 16859865; workDir: /scratch/mteb223/d2/cb35a0c9c1873ba27556d8f46b44e8
+Oct-24 14:37:09.230 [Task submitter] INFO  nextflow.Session - [d2/cb35a0] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (62)
+Oct-24 14:37:09.243 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (50) > jobId: 16859866; workDir: /scratch/mteb223/16/e3bed5f599335116ae9ec88d4e3ecd
+Oct-24 14:37:09.243 [Task submitter] INFO  nextflow.Session - [16/e3bed5] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (50)
+Oct-24 14:37:09.256 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (14) > jobId: 16859867; workDir: /scratch/mteb223/18/7f16e547a37219ab99c82c952ceb74
+Oct-24 14:37:09.256 [Task submitter] INFO  nextflow.Session - [18/7f16e5] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (14)
+Oct-24 14:37:09.270 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (34) > jobId: 16859868; workDir: /scratch/mteb223/14/1a8df4c6a38be7caadcd34efce4f2c
+Oct-24 14:37:09.270 [Task submitter] INFO  nextflow.Session - [14/1a8df4] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (34)
+Oct-24 14:37:09.282 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (35) > jobId: 16859869; workDir: /scratch/mteb223/e3/f3538e127046592b7915c41e9011a6
+Oct-24 14:37:09.282 [Task submitter] INFO  nextflow.Session - [e3/f3538e] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (35)
+Oct-24 14:37:09.294 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (6) > jobId: 16859870; workDir: /scratch/mteb223/26/27eef71120842b9ac4ef7676dc0556
+Oct-24 14:37:09.294 [Task submitter] INFO  nextflow.Session - [26/27eef7] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (6)
+Oct-24 14:37:09.307 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (32) > jobId: 16859871; workDir: /scratch/mteb223/66/6ba5e7c518fdd68d264c01f6d8fafc
+Oct-24 14:37:09.307 [Task submitter] INFO  nextflow.Session - [66/6ba5e7] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (32)
+Oct-24 14:37:09.319 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (33) > jobId: 16859872; workDir: /scratch/mteb223/9a/c949bf8abb91989f16d661533c36da
+Oct-24 14:37:09.319 [Task submitter] INFO  nextflow.Session - [9a/c949bf] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (33)
+Oct-24 14:37:09.331 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (20) > jobId: 16859873; workDir: /scratch/mteb223/ee/625285cf61babfa3a3afc8709f97bd
+Oct-24 14:37:09.331 [Task submitter] INFO  nextflow.Session - [ee/625285] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (20)
+Oct-24 14:37:09.343 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (43) > jobId: 16859874; workDir: /scratch/mteb223/a9/82c0e68a91562e32dced308b874248
+Oct-24 14:37:09.343 [Task submitter] INFO  nextflow.Session - [a9/82c0e6] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (43)
+Oct-24 14:37:09.356 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (27) > jobId: 16859875; workDir: /scratch/mteb223/3e/8abf47761bf494fb5533e0e4fe9211
+Oct-24 14:37:09.356 [Task submitter] INFO  nextflow.Session - [3e/8abf47] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (27)
+Oct-24 14:37:09.368 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (55) > jobId: 16859876; workDir: /scratch/mteb223/99/62428f90abc8f6b86b5d04f910a233
+Oct-24 14:37:09.368 [Task submitter] INFO  nextflow.Session - [99/62428f] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (55)
+Oct-24 14:37:09.380 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (12) > jobId: 16859877; workDir: /scratch/mteb223/93/cb5fa4f69b104a0cfea5655f7156a1
+Oct-24 14:37:09.380 [Task submitter] INFO  nextflow.Session - [93/cb5fa4] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (12)
+Oct-24 14:37:09.392 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (3) > jobId: 16859878; workDir: /scratch/mteb223/c3/ae907b4ad2e4b7f36e1553d3e504d7
+Oct-24 14:37:09.392 [Task submitter] INFO  nextflow.Session - [c3/ae907b] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (3)
+Oct-24 14:37:09.406 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (22) > jobId: 16859879; workDir: /scratch/mteb223/94/615ab1e897e448bcc5b582716b3866
+Oct-24 14:37:09.406 [Task submitter] INFO  nextflow.Session - [94/615ab1] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (22)
+Oct-24 14:37:09.419 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (60) > jobId: 16859880; workDir: /scratch/mteb223/ba/c7286c23f9b2104d32cb534e8af74f
+Oct-24 14:37:09.419 [Task submitter] INFO  nextflow.Session - [ba/c7286c] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (60)
+Oct-24 14:37:09.431 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (57) > jobId: 16859881; workDir: /scratch/mteb223/cd/928ac711d360893c8fe676d4072154
+Oct-24 14:37:09.431 [Task submitter] INFO  nextflow.Session - [cd/928ac7] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (57)
+Oct-24 14:37:09.443 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (26) > jobId: 16859882; workDir: /scratch/mteb223/f8/a5e7b9e904931f1ce7ce43fd4cdb28
+Oct-24 14:37:09.443 [Task submitter] INFO  nextflow.Session - [f8/a5e7b9] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (26)
+Oct-24 14:37:09.454 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (29) > jobId: 16859883; workDir: /scratch/mteb223/88/4fc3f0e800f4a61a302699f0a9d70d
+Oct-24 14:37:09.454 [Task submitter] INFO  nextflow.Session - [88/4fc3f0] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (29)
+Oct-24 14:37:09.466 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (61) > jobId: 16859884; workDir: /scratch/mteb223/92/0a50efbb1ca57c90a814962477bd86
+Oct-24 14:37:09.466 [Task submitter] INFO  nextflow.Session - [92/0a50ef] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (61)
+Oct-24 14:37:09.511 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (39) > jobId: 16859885; workDir: /scratch/mteb223/5c/839692211f06ce76e432ee2ab55ffa
+Oct-24 14:37:09.511 [Task submitter] INFO  nextflow.Session - [5c/839692] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (39)
+Oct-24 14:37:09.522 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (24) > jobId: 16859886; workDir: /scratch/mteb223/92/429241508c98fcadfee343444ecab4
+Oct-24 14:37:09.522 [Task submitter] INFO  nextflow.Session - [92/429241] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (24)
+Oct-24 14:37:09.534 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (52) > jobId: 16859887; workDir: /scratch/mteb223/b4/5da68cf56fc7cf7f057b6a33d0b037
+Oct-24 14:37:09.534 [Task submitter] INFO  nextflow.Session - [b4/5da68c] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (52)
+Oct-24 14:37:09.545 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (19) > jobId: 16859888; workDir: /scratch/mteb223/b7/1bc1bc53859751063b343048f54a70
+Oct-24 14:37:09.545 [Task submitter] INFO  nextflow.Session - [b7/1bc1bc] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (19)
+Oct-24 14:37:09.556 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (40) > jobId: 16859889; workDir: /scratch/mteb223/ee/1a3acfb3aad5f277c82805bfa5ece6
+Oct-24 14:37:09.556 [Task submitter] INFO  nextflow.Session - [ee/1a3acf] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (40)
+Oct-24 14:37:09.568 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:MAKE_FAI > jobId: 16859890; workDir: /scratch/mteb223/01/deb573ee6d8a41a595a12d813d6d6e
+Oct-24 14:37:09.568 [Task submitter] INFO  nextflow.Session - [01/deb573] Submitted process > NANOPORE_cDNA_STEP_2:MAKE_FAI
+Oct-24 14:37:09.580 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (38) > jobId: 16859891; workDir: /scratch/mteb223/ab/65c67c105ff19003426e8718ca0402
+Oct-24 14:37:09.580 [Task submitter] INFO  nextflow.Session - [ab/65c67c] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (38)
+Oct-24 14:37:09.591 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (65) > jobId: 16859892; workDir: /scratch/mteb223/ac/71a020823eb54f8a8e3116750fcd40
+Oct-24 14:37:09.591 [Task submitter] INFO  nextflow.Session - [ac/71a020] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (65)
+Oct-24 14:37:09.602 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (68) > jobId: 16859893; workDir: /scratch/mteb223/88/a15cdd13e80812b77350504f6860ca
+Oct-24 14:37:09.603 [Task submitter] INFO  nextflow.Session - [88/a15cdd] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (68)
+Oct-24 14:37:09.615 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (73) > jobId: 16859894; workDir: /scratch/mteb223/d8/0e8955229af86b8f1070df8ef72538
+Oct-24 14:37:09.615 [Task submitter] INFO  nextflow.Session - [d8/0e8955] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (73)
+Oct-24 14:37:09.625 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (28) > jobId: 16859895; workDir: /scratch/mteb223/a5/a80e1a07240fd67bab585e1d0ad8fa
+Oct-24 14:37:09.625 [Task submitter] INFO  nextflow.Session - [a5/a80e1a] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (28)
+Oct-24 14:37:09.637 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (49) > jobId: 16859896; workDir: /scratch/mteb223/2e/0e4fc32c05f5e0ca240b1f6a7ae18b
+Oct-24 14:37:09.637 [Task submitter] INFO  nextflow.Session - [2e/0e4fc3] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (49)
+Oct-24 14:37:09.649 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (31) > jobId: 16859897; workDir: /scratch/mteb223/d1/2898b91cc100a51da4eeae6fcd5d63
+Oct-24 14:37:09.649 [Task submitter] INFO  nextflow.Session - [d1/2898b9] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (31)
+Oct-24 14:37:09.659 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (42) > jobId: 16859898; workDir: /scratch/mteb223/23/2d69a77f9d85e1ddc5d85c99b4fcba
+Oct-24 14:37:09.660 [Task submitter] INFO  nextflow.Session - [23/2d69a7] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (42)
+Oct-24 14:37:09.671 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (54) > jobId: 16859899; workDir: /scratch/mteb223/a4/5f96ab78b8fe86189ca853a59246d1
+Oct-24 14:37:09.671 [Task submitter] INFO  nextflow.Session - [a4/5f96ab] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (54)
+Oct-24 14:37:09.684 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (21) > jobId: 16859900; workDir: /scratch/mteb223/df/296babec04c857489f289845348e62
+Oct-24 14:37:09.684 [Task submitter] INFO  nextflow.Session - [df/296bab] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (21)
+Oct-24 14:37:09.695 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (37) > jobId: 16859901; workDir: /scratch/mteb223/ff/7619fd8e7fac30a3042acfd079d35f
+Oct-24 14:37:09.695 [Task submitter] INFO  nextflow.Session - [ff/7619fd] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (37)
+Oct-24 14:37:09.706 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (74) > jobId: 16859902; workDir: /scratch/mteb223/fa/f6e3ed4aa40a87b15158dbd01ee38a
+Oct-24 14:37:09.706 [Task submitter] INFO  nextflow.Session - [fa/f6e3ed] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (74)
+Oct-24 14:37:09.717 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (10) > jobId: 16859903; workDir: /scratch/mteb223/2d/78e8099d6b9b68282e57edbcfa7ff9
+Oct-24 14:37:09.717 [Task submitter] INFO  nextflow.Session - [2d/78e809] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (10)
+Oct-24 14:37:09.728 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (58) > jobId: 16859904; workDir: /scratch/mteb223/41/bf38ff6657c61af84547e78a9604e5
+Oct-24 14:37:09.728 [Task submitter] INFO  nextflow.Session - [41/bf38ff] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (58)
+Oct-24 14:37:09.739 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (64) > jobId: 16859905; workDir: /scratch/mteb223/75/50439865e1f18c12be1b8ec4e883f3
+Oct-24 14:37:09.739 [Task submitter] INFO  nextflow.Session - [75/504398] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (64)
+Oct-24 14:37:09.750 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (53) > jobId: 16859906; workDir: /scratch/mteb223/de/aa2caf048725292428835ff0ea463e
+Oct-24 14:37:09.751 [Task submitter] INFO  nextflow.Session - [de/aa2caf] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (53)
+Oct-24 14:37:09.761 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (15) > jobId: 16859907; workDir: /scratch/mteb223/34/47465ff9715c8418f801e2aefbe3cd
+Oct-24 14:37:09.762 [Task submitter] INFO  nextflow.Session - [34/47465f] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (15)
+Oct-24 14:37:09.772 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (56) > jobId: 16859908; workDir: /scratch/mteb223/be/41a50753bbe0df22409f187c30a7ee
+Oct-24 14:37:09.772 [Task submitter] INFO  nextflow.Session - [be/41a507] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (56)
+Oct-24 14:37:09.782 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (30) > jobId: 16859909; workDir: /scratch/mteb223/23/c27a7dbb5a938152d3074a738bb5c8
+Oct-24 14:37:09.782 [Task submitter] INFO  nextflow.Session - [23/c27a7d] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (30)
+Oct-24 14:37:09.793 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (7) > jobId: 16859910; workDir: /scratch/mteb223/27/1584118d4e57c43967418d4e3aa57f
+Oct-24 14:37:09.793 [Task submitter] INFO  nextflow.Session - [27/158411] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (7)
+Oct-24 14:37:09.805 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (17) > jobId: 16859911; workDir: /scratch/mteb223/fe/f973d3eaafac535f421c496802549f
+Oct-24 14:37:09.805 [Task submitter] INFO  nextflow.Session - [fe/f973d3] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (17)
+Oct-24 14:37:09.816 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (2) > jobId: 16859912; workDir: /scratch/mteb223/72/2538b2f5960d206ba060bfd89a0c21
+Oct-24 14:37:09.816 [Task submitter] INFO  nextflow.Session - [72/2538b2] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (2)
+Oct-24 14:37:09.827 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (72) > jobId: 16859913; workDir: /scratch/mteb223/6d/0676f02b01e7c068956058ce355416
+Oct-24 14:37:09.827 [Task submitter] INFO  nextflow.Session - [6d/0676f0] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (72)
+Oct-24 14:37:09.838 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (13) > jobId: 16859914; workDir: /scratch/mteb223/56/c33b4f2d392f368990fd04dfba650c
+Oct-24 14:37:09.839 [Task submitter] INFO  nextflow.Session - [56/c33b4f] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (13)
+Oct-24 14:37:09.849 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (9) > jobId: 16859915; workDir: /scratch/mteb223/64/5d6343237c075dc691e645ea55a9f5
+Oct-24 14:37:09.849 [Task submitter] INFO  nextflow.Session - [64/5d6343] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (9)
+Oct-24 14:37:09.860 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (8) > jobId: 16859916; workDir: /scratch/mteb223/bf/64de45f361b72e38c3144d0444683e
+Oct-24 14:37:09.860 [Task submitter] INFO  nextflow.Session - [bf/64de45] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (8)
+Oct-24 14:37:09.871 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (46) > jobId: 16859917; workDir: /scratch/mteb223/98/b37e64a808c44254cc345baf3b5722
+Oct-24 14:37:09.871 [Task submitter] INFO  nextflow.Session - [98/b37e64] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (46)
+Oct-24 14:37:09.881 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (69) > jobId: 16859918; workDir: /scratch/mteb223/a0/bcbe5b2a7877c98c389f9b6bf92268
+Oct-24 14:37:09.881 [Task submitter] INFO  nextflow.Session - [a0/bcbe5b] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (69)
+Oct-24 14:37:09.892 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (63) > jobId: 16859919; workDir: /scratch/mteb223/6b/0c37d7ad71109115800b13af37d9b1
+Oct-24 14:37:09.893 [Task submitter] INFO  nextflow.Session - [6b/0c37d7] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (63)
+Oct-24 14:37:09.904 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (48) > jobId: 16859920; workDir: /scratch/mteb223/bc/9f505043035151faa76caa76d8d1d2
+Oct-24 14:37:09.904 [Task submitter] INFO  nextflow.Session - [bc/9f5050] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (48)
+Oct-24 14:37:09.915 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (18) > jobId: 16859921; workDir: /scratch/mteb223/29/8d91ad2389126385d5b76953881721
+Oct-24 14:37:09.915 [Task submitter] INFO  nextflow.Session - [29/8d91ad] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (18)
+Oct-24 14:37:09.926 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (71) > jobId: 16859922; workDir: /scratch/mteb223/4a/fe4f05918de533658f2b4414b66af5
+Oct-24 14:37:09.926 [Task submitter] INFO  nextflow.Session - [4a/fe4f05] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (71)
+Oct-24 14:37:09.937 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (36) > jobId: 16859923; workDir: /scratch/mteb223/6d/d7e8b79dd09bfd589e8a73716c194d
+Oct-24 14:37:09.937 [Task submitter] INFO  nextflow.Session - [6d/d7e8b7] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (36)
+Oct-24 14:37:09.947 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (11) > jobId: 16859924; workDir: /scratch/mteb223/0a/c000d3be58f71a32f1d3f904210dc8
+Oct-24 14:37:09.948 [Task submitter] INFO  nextflow.Session - [0a/c000d3] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (11)
+Oct-24 14:37:09.958 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (23) > jobId: 16859925; workDir: /scratch/mteb223/ec/ffc07cf018f7b6610e32e141fcfe27
+Oct-24 14:37:09.958 [Task submitter] INFO  nextflow.Session - [ec/ffc07c] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (23)
+Oct-24 14:37:09.969 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (44) > jobId: 16859926; workDir: /scratch/mteb223/e0/9b8e6f35eb46479c13c8ddfc51c6f2
+Oct-24 14:37:09.969 [Task submitter] INFO  nextflow.Session - [e0/9b8e6f] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (44)
+Oct-24 14:37:09.980 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (67) > jobId: 16859927; workDir: /scratch/mteb223/f2/e5b0e9fa92536032b78763aab2e0dc
+Oct-24 14:37:09.980 [Task submitter] INFO  nextflow.Session - [f2/e5b0e9] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (67)
+Oct-24 14:37:09.990 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (70) > jobId: 16859928; workDir: /scratch/mteb223/02/40368b14b8a2078c7fa47331306f76
+Oct-24 14:37:09.990 [Task submitter] INFO  nextflow.Session - [02/40368b] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (70)
+Oct-24 14:37:10.000 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (47) > jobId: 16859929; workDir: /scratch/mteb223/42/67f2321846ef4baa38e7e77b83ab95
+Oct-24 14:37:10.001 [Task submitter] INFO  nextflow.Session - [42/67f232] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (47)
+Oct-24 14:37:10.033 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (4) > jobId: 16859930; workDir: /scratch/mteb223/59/de99083e7b8344bea999d336d27872
+Oct-24 14:37:10.033 [Task submitter] INFO  nextflow.Session - [59/de9908] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (4)
+Oct-24 14:37:10.049 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:MAKE_INDEX_cDNA > jobId: 16859931; workDir: /scratch/mteb223/64/ee42b982a1603517518e1ebd68fa79
+Oct-24 14:37:10.049 [Task submitter] INFO  nextflow.Session - [64/ee42b9] Submitted process > NANOPORE_cDNA_STEP_2:MAKE_INDEX_cDNA
+Oct-24 14:37:10.058 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (41) > jobId: 16859932; workDir: /scratch/mteb223/e4/c7cd4e1411f08b70845b8c766165ef
+Oct-24 14:37:10.058 [Task submitter] INFO  nextflow.Session - [e4/c7cd4e] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (41)
+Oct-24 14:37:10.069 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (1) > jobId: 16859933; workDir: /scratch/mteb223/9c/fcf4bbf503932e59d11b29ee4e3004
+Oct-24 14:37:10.069 [Task submitter] INFO  nextflow.Session - [9c/fcf4bb] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (1)
+Oct-24 14:37:10.080 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (5) > jobId: 16859934; workDir: /scratch/mteb223/81/7eaef5b601eb066c3a6c8b43b4889c
+Oct-24 14:37:10.080 [Task submitter] INFO  nextflow.Session - [81/7eaef5] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (5)
+Oct-24 14:37:10.091 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (51) > jobId: 16859935; workDir: /scratch/mteb223/64/72d428ac6425574e885fd0d4143e57
+Oct-24 14:37:10.091 [Task submitter] INFO  nextflow.Session - [64/72d428] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (51)
+Oct-24 14:37:10.101 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (66) > jobId: 16859936; workDir: /scratch/mteb223/e5/3e5fff465364f9a0dcd25ea8600bf0
+Oct-24 14:37:10.101 [Task submitter] INFO  nextflow.Session - [e5/3e5fff] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (66)
+Oct-24 14:37:10.111 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (59) > jobId: 16859937; workDir: /scratch/mteb223/55/379a647e22bc566b3909d2b1ac476b
+Oct-24 14:37:10.111 [Task submitter] INFO  nextflow.Session - [55/379a64] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (59)
+Oct-24 14:37:10.121 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (45) > jobId: 16859938; workDir: /scratch/mteb223/1b/0bca6fc3f949f374402b5015099687
+Oct-24 14:37:10.121 [Task submitter] INFO  nextflow.Session - [1b/0bca6f] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (45)
+Oct-24 14:37:10.132 [Task submitter] DEBUG nextflow.executor.GridTaskHandler - [SLURM] submitted process NANOPORE_cDNA_STEP_2:PYCHOPPER (25) > jobId: 16859939; workDir: /scratch/mteb223/bb/ab8cabe57f37883dc2fc43d53d6556
+Oct-24 14:37:10.132 [Task submitter] INFO  nextflow.Session - [bb/ab8cab] Submitted process > NANOPORE_cDNA_STEP_2:PYCHOPPER (25)
+Oct-24 14:37:13.839 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[jobId: 16859865; id: 64; name: NANOPORE_cDNA_STEP_2:PYCHOPPER (62); status: COMPLETED; exit: 1; error: -; workDir: /scratch/mteb223/d2/cb35a0c9c1873ba27556d8f46b44e8 started: 1698172633836; exited: 2023-10-24T18:37:12.792526Z; ]
+Oct-24 14:37:13.842 [Task monitor] DEBUG nextflow.processor.TaskProcessor - Handling unexpected condition for
+  task: name=NANOPORE_cDNA_STEP_2:PYCHOPPER (62); work-dir=/scratch/mteb223/d2/cb35a0c9c1873ba27556d8f46b44e8
+  error [nextflow.exception.ProcessFailedException]: Process `NANOPORE_cDNA_STEP_2:PYCHOPPER (62)` terminated with an error exit status (1)
+Oct-24 14:37:13.861 [Task monitor] ERROR nextflow.processor.TaskProcessor - Error executing process > 'NANOPORE_cDNA_STEP_2:PYCHOPPER (62)'
+
+Caused by:
+  Process `NANOPORE_cDNA_STEP_2:PYCHOPPER (62)` terminated with an error exit status (1)
+
+Command executed:
+
+  ## Pychopper does not have PCS114 primers yes, need to create them ##
+  if [[ "PCS111" == "PCS114" ]]; then
+  
+      ## Create primer config file ##
+      echo "+:MySSP,-MyVNP|-:MyVNP,-MySSP" > primer_config.txt
+  
+      ## Create custom primers (using PCS111 here for test, neew to add PCS114 once we have access ##
+      echo ">MyVNP" > custom_pimers.fas
+      echo "ACTTGCCTGTCGCTCTATCTTCAGAGGAGAGTCCGCCGCCCGCAAGTTTT" >> custom_pimers.fas
+      echo ">MySSP" >> custom_pimers.fas
+      echo "TTTCTGTTGGTGCTGATATTGCTTT" >> custom_pimers.fas
+  
+      ## Run pychopper with the custom primers and primer config ##
+      pychopper -m edlib -b custom_pimers.fas -c primer_config.txt             -t 4             -Q 9             -r "44B_Cerebellum_AAAGCCGCAATCCCTA_pychopper_report.pdf"             -u "44B_Cerebellum_AAAGCCGCAATCCCTA_pychopper.unclassified.fq"             -w "44B_Cerebellum_AAAGCCGCAATCCCTA_pychopper.rescued.fq"             -S "44B_Cerebellum_AAAGCCGCAATCCCTA_pychopper.stats"             -A "44B_Cerebellum_AAAGCCGCAATCCCTA_pychopper.scores"             "44B_Cerebellum_AAAGCCGCAATCCCTA.fastq" "44B_Cerebellum_AAAGCCGCAATCCCTA_pychop.fq"
+  
+  ## All other kits just use default settings ##
+  else
+  
+      pychopper -m edlib             -t 4             -Q 9             -k PCS111             -r "44B_Cerebellum_AAAGCCGCAATCCCTA_pychopper_report.pdf"             -u "44B_Cerebellum_AAAGCCGCAATCCCTA_pychopper.unclassified.fq"             -w "44B_Cerebellum_AAAGCCGCAATCCCTA_pychopper.rescued.fq"             -S "44B_Cerebellum_AAAGCCGCAATCCCTA_pychopper.stats"             -A "44B_Cerebellum_AAAGCCGCAATCCCTA_pychopper.scores"             "44B_Cerebellum_AAAGCCGCAATCCCTA.fastq" "44B_Cerebellum_AAAGCCGCAATCCCTA_pychop.fq"
+  
+  fi
+
+Command exit status:
+  1
+
+Command output:
+  (empty)
+
+Command error:
+  Using kit: PCS111
+  Configurations to consider: "+:SSP,-VNP|-:VNP,-SSP"
+  Counting fastq records in input file: 44B_Cerebellum_AAAGCCGCAATCCCTA.fastq
+  Total fastq records in input file: 159
+  Traceback (most recent call last):
+    File "/conda/bin/pychopper", line 10, in <module>
+      sys.exit(main())
+    File "/conda/lib/python3.9/site-packages/pychopper/scripts/pychopper.py", line 435, in main
+      read_sample = list(
+    File "/conda/lib/python3.9/site-packages/pychopper/seq_utils.py", line 64, in readfq
+      for fx in fqin:
+    File "pysam/libcfaidx.pyx", line 651, in pysam.libcfaidx.FastxFile.__next__
+  ValueError: truncated quality string in 44B_Cerebellum_AAAGCCGCAATCCCTA.fastq
+
+Work dir:
+  /scratch/mteb223/d2/cb35a0c9c1873ba27556d8f46b44e8
+
+Tip: you can try to figure out what's wrong by changing to the process work dir and showing the script file named `.command.sh`
+Oct-24 14:37:13.866 [Task monitor] DEBUG nextflow.Session - Session aborted -- Cause: Process `NANOPORE_cDNA_STEP_2:PYCHOPPER (62)` terminated with an error exit status (1)
+Oct-24 14:37:13.878 [Task monitor] DEBUG nextflow.Session - The following nodes are still active:
+[process] NANOPORE_cDNA_STEP_2:MINIMAP2_cDNA
+  status=ACTIVE
+  port 0: (queue) OPEN  ; channel: id
+  port 1: (queue) OPEN  ; channel: fastq
+  port 2: (value) OPEN  ; channel: index
+  port 3: (queue) OPEN  ; channel: txt
+  port 4: (cntrl) -     ; channel: $
+
+[process] NANOPORE_cDNA_STEP_2:FILTER_BAM
+  status=ACTIVE
+  port 0: (queue) OPEN  ; channel: id
+  port 1: (value) bound ; channel: mapq
+  port 2: (queue) OPEN  ; channel: bam
+  port 3: (queue) OPEN  ; channel: bai
+  port 4: (cntrl) -     ; channel: $
+
+[process] NANOPORE_cDNA_STEP_2:BAMBU_PREP
+  status=ACTIVE
+  port 0: (queue) OPEN  ; channel: id
+  port 1: (value) bound ; channel: mapq
+  port 2: (queue) OPEN  ; channel: bam
+  port 3: (queue) OPEN  ; channel: bai
+  port 4: (value) bound ; channel: ref
+  port 5: (value) bound ; channel: gtf
+  port 6: (value) OPEN  ; channel: fai
+  port 7: (value) bound ; channel: track_reads
+  port 8: (cntrl) -     ; channel: $
+
+Oct-24 14:37:13.881 [main] DEBUG nextflow.Session - Session await > all processes finished
+Oct-24 14:37:13.882 [main] DEBUG nextflow.Session - Session await > all barriers passed
+Oct-24 14:37:13.886 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[jobId: 16859866; id: 52; name: NANOPORE_cDNA_STEP_2:PYCHOPPER (50); status: COMPLETED; exit: 1; error: -; workDir: /scratch/mteb223/16/e3bed5f599335116ae9ec88d4e3ecd started: 1698172633884; exited: 2023-10-24T18:37:13.042946Z; ]
+Oct-24 14:37:13.886 [Task monitor] DEBUG nextflow.processor.TaskProcessor - Handling unexpected condition for
+  task: name=NANOPORE_cDNA_STEP_2:PYCHOPPER (50); work-dir=/scratch/mteb223/16/e3bed5f599335116ae9ec88d4e3ecd
+  error [nextflow.exception.ProcessFailedException]: Process `NANOPORE_cDNA_STEP_2:PYCHOPPER (50)` terminated with an error exit status (1)
+Oct-24 14:37:13.887 [main] WARN  n.processor.TaskPollingMonitor - Killing running tasks (74)
+Oct-24 14:37:13.993 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[jobId: 16859870; id: 8; name: NANOPORE_cDNA_STEP_2:PYCHOPPER (6); status: COMPLETED; exit: 1; error: -; workDir: /scratch/mteb223/26/27eef71120842b9ac4ef7676dc0556 started: 1698172633990; exited: 2023-10-24T18:37:12.522566Z; ]
+Oct-24 14:37:13.993 [Task monitor] DEBUG nextflow.processor.TaskProcessor - Handling unexpected condition for
+  task: name=NANOPORE_cDNA_STEP_2:PYCHOPPER (6); work-dir=/scratch/mteb223/26/27eef71120842b9ac4ef7676dc0556
+  error [nextflow.exception.ProcessFailedException]: Process `NANOPORE_cDNA_STEP_2:PYCHOPPER (6)` terminated with an error exit status (1)
+Oct-24 14:37:14.026 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[jobId: 16859873; id: 22; name: NANOPORE_cDNA_STEP_2:PYCHOPPER (20); status: COMPLETED; exit: 1; error: -; workDir: /scratch/mteb223/ee/625285cf61babfa3a3afc8709f97bd started: 1698172634024; exited: 2023-10-24T18:37:12.046497Z; ]
+Oct-24 14:37:14.026 [Task monitor] DEBUG nextflow.processor.TaskProcessor - Handling unexpected condition for
+  task: name=NANOPORE_cDNA_STEP_2:PYCHOPPER (20); work-dir=/scratch/mteb223/ee/625285cf61babfa3a3afc8709f97bd
+  error [nextflow.exception.ProcessFailedException]: Process `NANOPORE_cDNA_STEP_2:PYCHOPPER (20)` terminated with an error exit status (1)
+Oct-24 14:37:14.031 [main] DEBUG nextflow.trace.WorkflowStatsObserver - Workflow completed > WorkflowStats[succeededCount=0; failedCount=4; ignoredCount=0; cachedCount=0; pendingCount=0; submittedCount=66; runningCount=-68; retriesCount=0; abortedCount=74; succeedDuration=0ms; failedDuration=9ms; cachedDuration=0ms;loadCpus=-68; loadMemory=0; peakRunning=2; peakCpus=2; peakMemory=0; ]
+Oct-24 14:37:14.033 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[jobId: 16859874; id: 45; name: NANOPORE_cDNA_STEP_2:PYCHOPPER (43); status: COMPLETED; exit: 1; error: -; workDir: /scratch/mteb223/a9/82c0e68a91562e32dced308b874248 started: 1698172634031; exited: 2023-10-24T18:37:12.088918Z; ]
+Oct-24 14:37:14.033 [Task monitor] DEBUG nextflow.processor.TaskProcessor - Handling unexpected condition for
+  task: name=NANOPORE_cDNA_STEP_2:PYCHOPPER (43); work-dir=/scratch/mteb223/a9/82c0e68a91562e32dced308b874248
+  error [nextflow.exception.ProcessFailedException]: Process `NANOPORE_cDNA_STEP_2:PYCHOPPER (43)` terminated with an error exit status (1)
+Oct-24 14:37:14.039 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[jobId: 16859875; id: 29; name: NANOPORE_cDNA_STEP_2:PYCHOPPER (27); status: COMPLETED; exit: 1; error: -; workDir: /scratch/mteb223/3e/8abf47761bf494fb5533e0e4fe9211 started: 1698172634037; exited: 2023-10-24T18:37:12.103491Z; ]
+Oct-24 14:37:14.039 [Task monitor] DEBUG nextflow.processor.TaskProcessor - Handling unexpected condition for
+  task: name=NANOPORE_cDNA_STEP_2:PYCHOPPER (27); work-dir=/scratch/mteb223/3e/8abf47761bf494fb5533e0e4fe9211
+  error [nextflow.exception.ProcessFailedException]: Process `NANOPORE_cDNA_STEP_2:PYCHOPPER (27)` terminated with an error exit status (1)
+Oct-24 14:37:14.044 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[jobId: 16859876; id: 57; name: NANOPORE_cDNA_STEP_2:PYCHOPPER (55); status: COMPLETED; exit: 1; error: -; workDir: /scratch/mteb223/99/62428f90abc8f6b86b5d04f910a233 started: 1698172634042; exited: 2023-10-24T18:37:12.195501Z; ]
+Oct-24 14:37:14.044 [Task monitor] DEBUG nextflow.processor.TaskProcessor - Handling unexpected condition for
+  task: name=NANOPORE_cDNA_STEP_2:PYCHOPPER (55); work-dir=/scratch/mteb223/99/62428f90abc8f6b86b5d04f910a233
+  error [nextflow.exception.ProcessFailedException]: Process `NANOPORE_cDNA_STEP_2:PYCHOPPER (55)` terminated with an error exit status (1)
+Oct-24 14:37:14.074 [main] DEBUG nextflow.cache.CacheDB - Closing CacheDB done
+Oct-24 14:37:14.084 [main] DEBUG nextflow.script.ScriptRunner - > Execution complete -- Goodbye
