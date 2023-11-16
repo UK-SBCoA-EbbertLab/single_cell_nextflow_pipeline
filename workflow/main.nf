@@ -1,11 +1,12 @@
 // Make this pipeline a nextflow 2 implementation
 nextflow.enable.dsl=2
 
-
 log.info """
    OXFORD NANOPORE cDNA SEQUENCING PIPELINE - Bernardo Aguzzoli Heberle - EBBERT LAB - University of Kentucky
  ==============================================================================================================
  nanopore fastq files                                           : ${params.ont_reads_fq}
+ nanopore fastq directory					: ${params.ont_reads_fq_dir}
+ demultiplex name						: ${params.demultiplex_name}
  nanopore sequencing summary files                              : ${params.ont_reads_txt}
  reference genome                                               : ${params.ref}
  reference annotation                                           : ${params.annotation}
@@ -35,7 +36,6 @@ log.info """
  Reference for contamination analysis                           : ${params.contamination_ref}
  ==============================================================================================================
  """
-
 
 // Import Workflows
 include {NANOPORE_STEP_0} from '../sub_workflows/nanopore_workflow_STEP_0'
@@ -67,6 +67,7 @@ fai = file(params.fai)
 bam = Channel.fromPath(params.bam).map { file -> tuple(file.baseName, file) }
 bai = Channel.fromPath(params.bai)
 contamination_ref = Channel.fromPath(params.contamination_ref)
+demultiplex_name = params.demultiplex_name
 
 
 if (params.ercc != "None") {
