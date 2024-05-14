@@ -5,7 +5,7 @@ log.info """
    OXFORD NANOPORE cDNA SEQUENCING PIPELINE - Bernardo Aguzzoli Heberle - EBBERT LAB - University of Kentucky
  ==============================================================================================================
  nanopore fastq files                                           : ${params.ont_reads_fq}
- nanopore fastq directory					: ${params.ont_reads_fq_dir}
+ nanopore fastq file directory					: ${params.ont_reads_fq_dir}
  demultiplex name						: ${params.demultiplex_name}
  nanopore sequencing summary files                              : ${params.ont_reads_txt}
  reference genome                                               : ${params.ref}
@@ -26,7 +26,8 @@ log.info """
 
  MAPQ value for filtering bam file                              : ${params.mapq}
 
- Step: 1 = basecalling, 2 = mapping, 3 = quantification         : ${params.step}
+ Step: 0 = pre processing 1 = basecalling, 
+       2 = mapping, 3 = quantification         			: ${params.step}
 
  Path to pre-processed bambu RDS files                          : ${params.bambu_rds}
  Path to QC files that go into MultiQC report                   : ${params.multiqc_input}   
@@ -35,19 +36,21 @@ log.info """
 
  Reference for contamination analysis                           : ${params.contamination_ref}
  ==============================================================================================================
- """
+"""
 
 // Import Workflows
+include {MERGE_FLOWCELL} from '../sub_workflows/concat_across_flowcell'
 include {NANOPORE_STEP_0} from '../sub_workflows/nanopore_workflow_STEP_0'
 include {NANOPORE_STEP_1} from '../sub_workflows/nanopore_workflow_STEP_1'
 include {NANOPORE_cDNA_STEP_2} from '../sub_workflows/nanopore_cDNA_workflow_STEP_2'
 include {NANOPORE_dRNA_STEP_2} from '../sub_workflows/nanopore_dRNA_workflow_STEP_2'
 include {NANOPORE_STEP_2_BAM} from '../sub_workflows/nanopore_workflow_STEP_2_BAM'
 include {NANOPORE_STEP_3} from '../sub_workflows/nanopore_workflow_STEP_3'
+include {NANOPORE_STEP_4} from '../sub_workflows/nanopore_workflow_STEP_4'
 
 
 // Define initial files and channels
-ont_reads_fq_dir = params.ont_reads_fq_dir
+ont_reads_fq_dir = Channel.fromPath(params.ont_reads_fq_dir)
 ont_reads_fq = Channel.fromPath(params.ont_reads_fq).map { file -> tuple(file.baseName, file) }
 ont_reads_txt = Channel.fromPath(file(params.ont_reads_txt))
 ref = file(params.ref)
@@ -64,10 +67,11 @@ mapq = Channel.value(params.mapq)
 bambu_rds = Channel.fromPath(params.bambu_rds)
 multiqc_input = Channel.fromPath(params.multiqc_input, type: "file")
 fai = file(params.fai)
-bam = Channel.fromPath(params.bam).map { file -> tuple(file.baseName, file) }
+bam = Channel.fromPath(params.bam).map { file -> tuple(file.baseName, file) } 
 bai = Channel.fromPath(params.bai)
 contamination_ref = Channel.fromPath(params.contamination_ref)
 demultiplex_name = params.demultiplex_name
+sampleIDtable = params.sampleIDtable
 
 
 if (params.ercc != "None") {
@@ -101,7 +105,12 @@ if ((params.bam != "None") && (params.bai != "None")) {
 
 workflow {
     if(params.step == 0){
-	NANOPORE_STEP_0(ont_reads_fq_dir, demultiplex_name)
+	if(params.sampleIDtable != "None"){
+		ont_reads_fq_dir = Channel.value(params.ont_reads_fq_dir)
+		MERGE_FLOWCELL(sampleIDtable, ont_reads_fq_dir)
+	}else {
+		NANOPORE_STEP_0(ont_reads_fq_dir, demultiplex_name)
+	}
     }else if (params.step == 1){
         NANOPORE_STEP_1(fast5_dir, basecall_config, basecall_id)
     }
@@ -129,7 +138,11 @@ workflow {
 
     else if(params.step == 3){
         
-        NANOPORE_STEP_3(ref, fai, annotation, NDR, track_reads, bambu_rds, multiqc_input, multiqc_config)
+        NANOPORE_STEP_3(ref, fai, annotation, NDR, track_reads, bambu_rds, multiqc_input, multiqc_config, demultiplex_name)
+    }
+
+    else if(params.step == 4){
+	NANOPORE_STEP_4(ont_reads_fq_dir, demultiplex_name)
     }
 
 }

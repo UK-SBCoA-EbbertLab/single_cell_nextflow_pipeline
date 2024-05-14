@@ -1,5 +1,5 @@
 process CONVERT_NANOPORE {
-	label 'medium'
+	label 'huge'
 
 	input:
 		path input_fastq
@@ -9,11 +9,11 @@ process CONVERT_NANOPORE {
 
 	script:
 	"""
-		
+		mkdir converted		
 		java \
-		    -Xms100g \
-		    -Xmx140g \
-		    -cp /scratch/bjwh228/nextflow/RNA_seq_single_cell_nextflow-pipeline/workflow/bin/NanoporeConverter-Java/ \
+		    -Xms300g \
+		    -Xmx400g \
+		    -cp /scratch/bjwh228/working_single_cell_pipeline/workflow/bin/NanoporeConverter-Java/ \
 		    NanoporeConverter \
 		    ${input_fastq} \
 		    "converted/"	
@@ -24,7 +24,7 @@ process PIPSEEKER {
 	
 	publishDir "results/${params.out_dir}/barcoding", mode: "copy", overwrite: true
 
-	label 'medium_large'
+	label 'huge'
 
 	input:
 		path(fastq)
@@ -38,6 +38,6 @@ process PIPSEEKER {
 	script:
 	"""
 		converted_dir=${dir}
-		pipseeker barcode --skip-version-check --chemistry v3 --fastq \$converted_dir/. --output-path . 
+		pipseeker barcode --verbosity 2 --skip-version-check --chemistry v4 --fastq \$converted_dir/. --output-path . 
 	"""
 }	

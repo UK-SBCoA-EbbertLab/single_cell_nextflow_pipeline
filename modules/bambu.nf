@@ -22,8 +22,7 @@ process BAMBU_PREP {
         mkdir -p bambu_prep
 
         bambu_prep.R $bam $ref $gtf $track_reads
-
-        mv ./bambu_prep/*.rds "./bambu_prep/${id}_mapq_${mapq}.rds"
+        mv ./bambu_prep/*.rds './bambu_prep/${id}_mapq_${mapq}.rds'
         """
 }
 
@@ -45,6 +44,7 @@ process BAMBU_DISCOVERY {
     output:
         path("./bambu_discovery/extended_annotations.gtf"), emit:gtf
         path("bambu_discovery/*"), emit: outty
+	path("bambu_discovery/"), emit: outdir
 
     shell:
         '''
@@ -75,6 +75,7 @@ process BAMBU_QUANT {
     output:
         path("bambu_quant/*.gtf"), emit:gtf
         path("bambu_quant/*"), emit: outty
+	//path("bambu_quant/"), emit: outdir
 
     shell:
         '''

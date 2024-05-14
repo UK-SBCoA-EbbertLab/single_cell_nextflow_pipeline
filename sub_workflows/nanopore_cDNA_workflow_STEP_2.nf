@@ -28,7 +28,7 @@ workflow NANOPORE_cDNA_STEP_2 {
     main:
         MAKE_FAI(ref)
         MAKE_INDEX_cDNA(ref)
-        // PYCHOPPER(ont_reads_fq, ont_reads_txt, cdna_kit)
+        PYCHOPPER(ont_reads_fq, ont_reads_txt, cdna_kit)
         MINIMAP2_cDNA(ont_reads_fq,  MAKE_INDEX_cDNA.out, ont_reads_txt)
         FILTER_BAM(MINIMAP2_cDNA.out.id, mapq, MINIMAP2_cDNA.out.bam, MINIMAP2_cDNA.out.bai)
         

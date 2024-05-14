@@ -8,13 +8,13 @@ workflow NANOPORE_STEP_0 {
 		ont_reads_fq_dir
 		demultiplex_name
         main:
-                CONVERT_NANOPORE(ont_reads_dir)
+                CONVERT_NANOPORE(ont_reads_fq_dir)
 
-                PIPSEEKER(ont_reads_dir, CONVERT_NANOPORE.out.dir.collect())
+                PIPSEEKER(ont_reads_fq_dir, CONVERT_NANOPORE.out.dir.collect())
 
-                CREATE_FASTA(PIPSEEKER.out.barcode_list)
+               // CREATE_FASTA(PIPSEEKER.out.barcode_list)
 
-                BARCODE_CONFIG(PIPSEEKER.out.barcode_list)
+               // BARCODE_CONFIG(PIPSEEKER.out.barcode_list)
 		
 		FILTER_PIP(PIPSEEKER.out.barcoded_fastqs.collect(), demultiplex_name)
 }

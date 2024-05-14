@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 public class NanoporeConverter {
 
+    private static final int BUFFER_SIZE = 100000;
     private static final String REVERSE_MAP = "ACGTacgt";
     private static final String REVERSE_COMPLEMENT_MAP = "TGCATGCA";
     
@@ -48,7 +49,7 @@ public class NanoporeConverter {
         ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         List<Future<?>> futures = new ArrayList<>();
 
-        File[] fastqFiles = new File(sourceDir).listFiles((dir, name) -> name.endsWith(".fastq.gz"));
+        File[] fastqFiles = new File(sourceDir).listFiles((dir, name) -> name.endsWith(".fastq"));
 
         if (fastqFiles == null || fastqFiles.length == 0) {
             System.err.println("No .fastq.gz files found in the source directory.");
@@ -116,8 +117,9 @@ public class NanoporeConverter {
     public static void convertNanopore(File fastqFile, String r1Out, String r2Out) throws IOException {
             List<String> r1Buffer = new ArrayList<>();
             List<String> r2Buffer = new ArrayList<>();
+	    int bufferCount = 0;
 
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(fastqFile))))) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(fastqFile)))) {
                 String line;
 		int i = Integer.parseInt(fastqFile.getName().split("_")[1].replaceAll("[^\\d]", ""));
                 int idx = 0;
@@ -133,7 +135,18 @@ public class NanoporeConverter {
                 // Processing each line of the file
                 while ((line = reader.readLine()) != null) {
                     // idx == 1 is Sequence line
+		    if(bufferCount % 10000 == 0 && idx == 1){ 
+		    	System.out.println("bufferCount: " + bufferCount);
+		    }
                     if(idx == 1) {
+			if (++bufferCount >= BUFFER_SIZE) {
+				System.out.println("WRITING");
+                        	appendToFile(r1Out, String.join("\n", r1Buffer) + "\n");
+                        	appendToFile(r2Out, String.join("\n", r2Buffer) + "\n");
+                    		r1Buffer.clear();
+                    		r2Buffer.clear();
+                    		bufferCount = 0; // Reset buffer count
+                	}
                         reverse = false;
                         //Matcher matchr = null;
                         for (String pattern : PATTERNS) {
@@ -240,7 +253,9 @@ public class NanoporeConverter {
      */
     private static void appendToFile(String path, String content) throws IOException {
         try (GZIPOutputStream out = new GZIPOutputStream(new FileOutputStream(path, true))){
+	    System.out.println("WRITING");
             out.write(content.getBytes());
+	    out.flush();
         }
     }
 
@@ -255,6 +270,6 @@ public class NanoporeConverter {
             int idx = REVERSE_MAP.indexOf(c);
             sb.append(idx >= 0 ? REVERSE_COMPLEMENT_MAP.charAt(idx) : c);
         }
-        return sb.reverse().toString().strip();
+        return sb.reverse().toString();
     }
 }

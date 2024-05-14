@@ -35,7 +35,6 @@ workflow NANOPORE_STEP_2_BAM {
                 annotation = CHM13_GTF_ERCC.out.collect()
             }
         }
-
+	
         BAMBU_PREP(FILTER_BAM_ONLY.out.id, mapq, FILTER_BAM_ONLY.out.bam, FILTER_BAM_ONLY.out.bai, ref, annotation, MAKE_FAI.out, track_reads)
-
 }

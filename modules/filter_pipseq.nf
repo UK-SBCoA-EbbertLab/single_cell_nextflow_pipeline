@@ -2,7 +2,7 @@ process FILTER_PIP {
 	
         publishDir "results/${params.out_dir}/", mode: "copy", overwrite: true
 
-	label 'filter'
+	label 'barcoding'
 
 	input:
 		path(dir)
@@ -14,11 +14,12 @@ process FILTER_PIP {
 		java \
     		-Xms100g \
 	   	-Xmx140g \
-	   	-cp /scratch/bjwh228/nextflow/RNA_seq_single_cell_nextflow-pipeline/workflow/bin/PIPSeqDemultiplexer-Java/ \
+	   	-cp /scratch/bjwh228/working_single_cell_pipeline/workflow/bin/PIPSeqDemultiplexer-Java/ \
 	   	PIPSeqDemultiplexer \
 	   	${dir} \
 	   	"${name}-demultiplexed" \
 	   	${name} \
-		8
+		8 \
+		500
 	"""
 }

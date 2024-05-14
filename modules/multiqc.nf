@@ -2,7 +2,7 @@ process MULTIQC_GRCh38 {
 
     publishDir "results/${params.out_dir}/multiQC_output", mode: "copy", overwrite: true
 
-    label 'tiny'
+    label 'huge'
 
     input:
         path(multiqc_input)
