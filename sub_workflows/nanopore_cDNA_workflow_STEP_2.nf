@@ -24,13 +24,15 @@ workflow NANOPORE_cDNA_STEP_2 {
         track_reads
         mapq
         contamination_ref
+	mapped_reads_thresh
 
     main:
         MAKE_FAI(ref)
         MAKE_INDEX_cDNA(ref)
         PYCHOPPER(ont_reads_fq, ont_reads_txt, cdna_kit)
         MINIMAP2_cDNA(ont_reads_fq,  MAKE_INDEX_cDNA.out, ont_reads_txt)
-        FILTER_BAM(MINIMAP2_cDNA.out.id, mapq, MINIMAP2_cDNA.out.bam, MINIMAP2_cDNA.out.bai)
+        FILTER_BAM(MINIMAP2_cDNA.out.id, mapq, MINIMAP2_cDNA.out.bam, MINIMAP2_cDNA.out.bai, mapped_reads_thresh)
+        BAMBU_PREP(FILTER_BAM.out.id, mapq, FILTER_BAM.out.bam, FILTER_BAM.out.bai, ref, annotation, MAKE_FAI.out, track_reads)
         
         if (params.contamination_ref != "None") {
 
@@ -68,6 +70,5 @@ workflow NANOPORE_cDNA_STEP_2 {
             }
         }
         
-        BAMBU_PREP(FILTER_BAM.out.id, mapq, FILTER_BAM.out.bam, FILTER_BAM.out.bai, ref, annotation, MAKE_FAI.out, track_reads)
 
 }

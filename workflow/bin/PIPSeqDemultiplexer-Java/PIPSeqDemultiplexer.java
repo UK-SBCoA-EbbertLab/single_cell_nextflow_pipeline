@@ -26,38 +26,43 @@ public class PIPSeqDemultiplexer {
 	private static int MINIMUM_READ_COUNT = 500;
 
 
-	public static void demultiplexPips(String fastqDir, String outputDir, String sampleName, int numThreads, int minimumReads) {
-		int index = 1;
-		
+	public static void demultiplexPips(String fastqR1, String fastqR2, String sampleName, int numThreads, int minimumReads) {
 		MINIMUM_READ_COUNT = minimumReads;
 
-		ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+//		ExecutorService executor = Executors.newFixedThreadPool(numThreads);
 
-		List<Future<Void>> futures = new ArrayList<>();
+//		List<Future<Void>> futures = new ArrayList<>();
 
-		while (true) {
-			String r1Path = fastqDir + "/barcoded_" + index + "_R1.fastq.gz";
-			String r2Path = fastqDir + "/barcoded_" + index + "_R2.fastq.gz";
+//		while (true) {
+//			String fastqR1 = fastqDir + "/barcoded_" + index + "_R1.fastq.gz";
+//			String r2Path = fastqDir + "/barcoded_" + index + "_R2.fastq.gz";
 
-			if (Files.exists(Paths.get(r1Path)) && Files.exists(Paths.get(r2Path))) {
-				final int idx = index;
-				futures.add(executor.submit(() -> {
-					processFiles(idx, fastqDir, outputDir, sampleName);
-					return null;
-				}));
-				index++;
-			} else {
-				break;
-			}
-		}
-
-		for (Future<Void> future : futures) {
+		if (Files.exists(Paths.get(fastqR1)) && Files.exists(Paths.get(fastqR2))) {
+				// final int idx = index;
+			//	futures.add(executor.submit(() -> {
+			//
 			try {
-				future.get();
-			} catch (Exception e) {
+				processFiles(fastqR1, fastqR2, sampleName);
+			} catch (IOException e) {
+				System.out.println("YOU ARE THE ONLY EXCEPTION");
+
 				e.printStackTrace();
 			}
+			//		return null;
+			//	}));
+			//	index++;
+			//} else {
+		//		break;
 		}
+//		}
+
+//		for (Future<Void> future : futures) {
+//			try {
+//				future.get();
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//		}
 
 		/*
 		 * Write all buffers (cells) with at least the MINIMUM_READ_COUNT.
@@ -66,36 +71,30 @@ public class PIPSeqDemultiplexer {
 		writeRemainingLineCountsHistogramToFile(sampleName);
 		flushAllBuffersAboveMinimumReadCount();
 
-		executor.shutdown();
+	//	executor.shutdown();
 	}
 
-	public static void processFiles(int index, String fastqDir, String outputDir, String sampleName) throws IOException {
+	public static void processFiles(String fastqR1, String fastqR2, String sampleName) throws IOException {
 
-		Path outputPath = Paths.get(outputDir);
-		Files.createDirectories(outputPath);
-
-		String r1Path = fastqDir + "/barcoded_" + index + "_R1.fastq.gz";
-		String r2Path = fastqDir + "/barcoded_" + index + "_R2.fastq.gz";
-		String f1ReadName, f1Seq, f2ReadName, outputFileName;
-		Path outputFile;
+		String f1ReadName, f1Seq, f2ReadName;
 
 		/*
 		 * This String array should have four entries (one per line in a read)
 		 */
 		String[] f1Read, f2Read; 
 
-		BufferedReader file1Reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(r1Path))));
-		BufferedReader file2Reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(r2Path))));
+		BufferedReader file1Reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(fastqR1))));
+		BufferedReader file2Reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(fastqR2))));
 			
 		int readsProcessed = 0;
 
 		while(true){
 			
 			if(readsProcessed % 1000000 == 0) {
-				System.out.println("(Process " + index + ") Processed " +
+				System.out.println("Processed " +
 						NumberFormat.getNumberInstance(Locale.US).format(readsProcessed) +
 						" reads (" + NumberFormat.getNumberInstance(Locale.US).format(readsProcessed * 4) +
-						" lines) in " + r1Path + "...");
+						" lines) in " + fastqR1 + "...");
 			}
 
 			f1Read = getNextRead(file1Reader);
@@ -131,8 +130,7 @@ public class PIPSeqDemultiplexer {
 						+ " the input files are complete (i.e., not truncated).");
 			}
 
-			outputFileName = sampleName + "_" + f1Seq.substring(0, 16) + ".fastq";
-			outputFile = outputPath.resolve(outputFileName);
+			Path outputFile = Paths.get(sampleName + "_" + f1Seq.substring(0, 16) + ".fastq");
 
 			addToBuffer(outputFile, f2Read);
 			readsProcessed++;
@@ -361,12 +359,12 @@ public class PIPSeqDemultiplexer {
 	public static void main(String[] args) {
 		
 	    if (args.length != 5) {
-	        System.out.println("Usage: FastqFilter <fastqDir> <outputDir> <fileName> <numThreads> <minimumReadCount>");
+	        System.out.println("Usage: FastqFilter <fastqR1> <fastqR2> <sampleName> <numThreads> <minimumReadCount>");
 	        return;
 	    }
 
-	    String fastqDir = Paths.get(args[0]).toAbsolutePath().toString();
-	    String outputDir = Paths.get(args[1]).toAbsolutePath().toString();
+	    String fastqR1 = Paths.get(args[0]).toAbsolutePath().toString();
+	    String fastqR2 = Paths.get(args[1]).toAbsolutePath().toString();
 	    String sampleName = args[2];
 	    int numThreads, minimumReads;
 	    
@@ -378,7 +376,7 @@ public class PIPSeqDemultiplexer {
 	        return;
 	    }
 	    
-		demultiplexPips(fastqDir, outputDir, sampleName, numThreads, minimumReads);
+		demultiplexPips(fastqR1, fastqR2, sampleName, numThreads, minimumReads);
 	}
 
 

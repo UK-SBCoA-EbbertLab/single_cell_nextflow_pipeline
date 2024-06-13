@@ -1,4 +1,6 @@
 process MAKE_INDEX_cDNA {
+    
+    publishDir "results/${params.out_dir}/mmi/", mode: "copy", overwrite: true
 
     label 'large'
 

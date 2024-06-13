@@ -16,10 +16,8 @@ workflow NANOPORE_STEP_3 {
         bambu_rds
         multiqc_input
         multiqc_config
-	demultiplex_name
 
     main:
-
         nSamples = 300
         if (params.is_chm13 == true)
         {

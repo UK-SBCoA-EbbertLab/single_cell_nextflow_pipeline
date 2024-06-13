@@ -13,7 +13,7 @@ process MULTIQC_GRCh38 {
 
     script:
         """    
-        multiqc -c $multiqc_config -n multiQC_report.html .
+        multiqc -c ${multiqc_config} -n multiQC_report.html .
         """
 }
 

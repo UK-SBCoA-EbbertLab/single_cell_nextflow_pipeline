@@ -83,6 +83,7 @@ process MINIMAP2_dRNA {
 process FILTER_BAM {
 
     publishDir "results/${params.out_dir}/bam_filtering/", mode: "copy", pattern: "*.*stat"
+    publishDir "results/${params.out_dir}/bam_filtering/", mode: "copy", pattern: "*.bam*"
 
     label 'tiny'
 
@@ -91,6 +92,7 @@ process FILTER_BAM {
         val(mapq)
         path(bam)
         path(bai)
+	val(mapped_reads_thresh)
 
     output:
         env(id), emit: id, optional: true
@@ -114,7 +116,7 @@ process FILTER_BAM {
         ## If flagstat file says there are no mapped reads then delete bam and bai files.
 				## Since we passed optional on the output statement lines the script should still run fine even
 				## When the files are deleted. However, I never used optional before so I am not 100% sure
-				if [ \$var -lt 100 ]; then
+				if [ \$var -lt ${mapped_reads_thresh} ]; then
 					rm ${id}_filtered_mapq_${mapq}.ba*
 				else
         	id="${id}"

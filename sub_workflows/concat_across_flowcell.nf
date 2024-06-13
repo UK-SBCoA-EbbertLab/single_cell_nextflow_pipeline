@@ -1,11 +1,13 @@
-include {MERGE_SUMMARY ; MERGE_FASTQ} from '../modules/merge'
+include {SEP_DIR_BY_SAMP ; MERGE_SUMMARY ; MERGE_FASTQ} from '../modules/merge'
 
 workflow MERGE_FLOWCELL {
 
 	take: 
-		sampleIDtable
-		ont_reads_fq_dir
+		sample_id_table
+		ont_fq_to_merge
 	main:
-		MERGE_SUMMARY(sampleIDtable, ont_reads_fq_dir)
-		MERGE_FASTQ(sampleIDtable, ont_reads_fq_dir)
+		SEP_DIR_BY_SAMP(sample_id_table)
+		SEP_DIR_BY_SAMP.out.dir_by_samp.view()
+		MERGE_SUMMARY(SEP_DIR_BY_SAMP.out.dir_by_samp.flatten(), ont_fq_to_merge)
+		MERGE_FASTQ(SEP_DIR_BY_SAMP.out.dir_by_samp.flatten(), ont_fq_to_merge)
 }		

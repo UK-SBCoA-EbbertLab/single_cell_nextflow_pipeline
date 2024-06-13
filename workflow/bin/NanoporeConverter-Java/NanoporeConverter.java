@@ -18,6 +18,7 @@ public class NanoporeConverter {
     private static final List<String> PATTERNS = Arrays.asList(
 
             ".{8}ATG.{6}GAG.{6}TCGAG.{8}",
+//            "(.{8})ATG(.{6})GAG(.{6})TCGAG(.{8})",
 
             // Barcode indels
             ".{8}ATG.{5}GAG.{6}TCGAG.{8}", ".{8}ATG.{7}GAG.{6}TCGAG.{8}",
@@ -35,61 +36,94 @@ public class NanoporeConverter {
             ".{8}ATG.{6}GAG.{6}TCG.AG.{8}", ".{8}ATG.{6}GAG.{6}TCGA.G.{8}" 
         );
 
+    public static String getBaseName(String fileName) {
+        int firstDotIndex = fileName.indexOf('.');
+        if (firstDotIndex == -1) {
+            return fileName; // No extension found
+        }
+        return fileName.substring(0, firstDotIndex);
+    }
+
     public static void main(String[] args) {
         // Check if correct number of arguments provided
-        if (args.length != 2) {
-            System.err.println("Usage: NanoporeConverter <sourceDir> <outputDir>");
+        if (args.length != 1) {
+            System.err.println("Usage: NanoporeConverter <inputFastq>");
             System.exit(1);
         }
 
-        String sourceDir = Paths.get(args[0]).toAbsolutePath().toString();
-        String outputDir = Paths.get(args[1]).toAbsolutePath().toString();
+        File fastqFile = new File(Paths.get(args[0]).toAbsolutePath().toString());
 
         ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         List<Future<?>> futures = new ArrayList<>();
+//
+//        File[] fastqFiles = new File(sourceDir).listFiles((dir, name) -> name.endsWith(".fastq.gz"));
 
-        File[] fastqFiles = new File(sourceDir).listFiles((dir, name) -> name.endsWith(".fastq.gz"));
+//        if (fastqFiles == null || fastqFiles.length == 0) {
+//            System.err.println("No .fastq.gz files found in the source directory.");
+//            System.exit(1);
+//        }
 
-        if (fastqFiles == null || fastqFiles.length == 0) {
-            System.err.println("No .fastq.gz files found in the source directory.");
-            return;
-        }
+//	System.out.println("fastq files" + Arrays.toString(fastqFiles));
 
-        // Prepare output files for writing
-        String r1Out = outputDir + File.separator + "standard_R1.fastq.gz";
-        String r2Out = outputDir + File.separator + "standard_R2.fastq.gz";
-
-        // Clear or initialize output files
- 	try {
-    		clearFile(r1Out);
-	} catch (IOException e) {
-    		System.err.println("An error occurred while clearing the file: " + r1Out);
-    		e.printStackTrace();
-	}
-
-	try {
-    		clearFile(r2Out);
-	} catch (IOException e) {
-    		System.err.println("An error occurred while clearing the file: " + r2Out);
-    		e.printStackTrace();
-	}
-
-        for (File fastqFile : fastqFiles) {
+  //      for (File fastqFile : fastqFiles) {
             // Submit each file processing as a separate task
             Future<?> future = executor.submit(() -> {
                 try {
-                    convertNanopore(fastqFile, r1Out, r2Out);
+//			System.out.println(fastqFile);
+			String fileName = fastqFile.getName();
+			String baseFileName = getBaseName(fileName);
+
+        		// Prepare output files for writing
+		        String r1Out = baseFileName + "_standard_R1.fastq.gz";
+		        String r2Out = baseFileName + "_standard_R2.fastq.gz";
+//			System.out.println(r1Out);
+//			System.out.println(r2Out);
+
+			try {
+				File r1 = new File(r1Out);
+				r1.createNewFile();
+//				System.out.println(r1);
+			} catch ( Exception e ) {
+		    		System.err.println("An error occurred while creating the file: " + r1Out);
+				e.printStackTrace();
+			}
+			try {
+				File r2 = new File(r2Out);
+				r2.createNewFile();
+			} catch (Exception e) {
+		    		System.err.println("An error occurred while creating the file: " + r2Out);
+				e.printStackTrace();
+			}
+
+//			System.out.println(fastqFile);
+
+		        // Clear or initialize output files
+		 	try {
+		    		clearFile(r1Out);
+			} catch (IOException e) {
+		    		System.err.println("An error occurred while clearing the file: " + r1Out);
+		    		e.printStackTrace();
+			}
+
+			try {
+		    		clearFile(r2Out);
+			} catch (IOException e) {
+		    		System.err.println("An error occurred while clearing the file: " + r2Out);
+		    		e.printStackTrace();
+			}
+
+                    convertNanopore(fastqFile, r1Out, r2Out, baseFileName);
                 } catch (IOException e) {
                     System.err.println("Error processing file: " + fastqFile.getName() + ". Error: " + e.getMessage());
                 }
             });
             futures.add(future);
-        }
+    //    }
 
         // Wait for all tasks to complete
-        for (Future<?> future : futures) {
+        for (Future<?> future1 : futures) {
             try {
-                future.get();
+                future1.get();
             } catch (InterruptedException | ExecutionException e) {
                 System.err.println("Error in processing: " + e.getMessage());
             }
@@ -109,31 +143,39 @@ public class NanoporeConverter {
 
     /**
      * Converts Nanopore FASTQ files to standard paired-end Illumina format.
-     * @param sourceDir - The directory containing the input FASTQ files.
-     * @param outputDir - The directory where the output files will be saved.
+     * @param inputFastq - The FASTQ file to convert.
      * @throws IOException if an error occurs during file operations.
      */
-    public static void convertNanopore(File fastqFile, String r1Out, String r2Out) throws IOException {
+    public static void convertNanopore(File fastqFile, String r1Out, String r2Out, String fileBaseName) throws IOException {
             List<String> r1Buffer = new ArrayList<>();
             List<String> r2Buffer = new ArrayList<>();
+//	    System.out.println(fastqFile);
 
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(fastqFile))))) {
                 String line;
-		int i = Integer.parseInt(fastqFile.getName().split("_")[1].replaceAll("[^\\d]", ""));
+		// TODO: double check what the pattern needs to be for this
+	//	int i = Integer.parseInt(fastqFile.getName().replaceAll("[^\\d]", ""));
+		//int i = Integer.parseInt(fastqFile.getName().split("_")[1].replaceAll("[^\\d]", ""));
                 int idx = 0;
                 boolean skipRead = false;
                 int r1StartPos = 0, r1EndPos = 0, r2StartPos = 0;
-                String r1Sequence = "", r2Sequence = "";
+                String r1Sequence = "", r2Sequence = "", ogHeaderInfo = "";
                 boolean reverse = false;
 		boolean found = false;
+		boolean firstTime = true;
 
 		int inReadIndex = 0;
         	int outReadIndex = 1;
 
                 // Processing each line of the file
                 while ((line = reader.readLine()) != null) {
+		    if (idx == 0) {
+			ogHeaderInfo = line.substring(1);   
+		    }
+//		    System.out.println(line);
+//		    System.out.flush();
                     // idx == 1 is Sequence line
-                    if(idx == 1) {
+		    else if(idx == 1) {
                         reverse = false;
                         //Matcher matchr = null;
                         for (String pattern : PATTERNS) {
@@ -191,7 +233,7 @@ public class NanoporeConverter {
                             String r1Qual = line.substring(r1StartPos, r1EndPos).trim();
                             String r2Qual = line.substring(r2StartPos).trim();
 
-                            String readHeader = "@" + "file_" + i + "_read_" + outReadIndex;
+                            String readHeader = "@" + "file_" + fileBaseName + "_read_" + outReadIndex + " " + ogHeaderInfo;
 				
                             r1Buffer.add(readHeader);
                             r1Buffer.add(r1Sequence);
@@ -203,6 +245,17 @@ public class NanoporeConverter {
                             r2Buffer.add("+");
                             r2Buffer.add(new StringBuilder(r2Qual).reverse().toString());
 
+			    if (firstTime) {
+				    System.out.println(readHeader);
+				    System.out.println(r1Sequence);
+				    System.out.println(r1Qual);
+				    System.out.println(r2Sequence);
+				    System.out.println(r2Qual);
+
+				    firstTime = false;
+			    }
+
+
                             outReadIndex += 1;
                         }
                         skipRead = false;
@@ -212,7 +265,9 @@ public class NanoporeConverter {
                 }
 	    } catch (IOException e) {
                 System.err.println("Error processing file: " + fastqFile.getName() + ". Error: " + e.getMessage());
-            }
+            } catch (Exception e) {
+                System.err.println("Error processing file: " + fastqFile.getName() + ". Error: " + e.getMessage());
+	    }
 
             // Write buffers to output files
             synchronized (NanoporeConverter.class) {

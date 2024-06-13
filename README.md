@@ -32,6 +32,14 @@ for the job manager.
 - refecence/assembly ".fa" file.
 
 - annotation ".gtf" file is preffered. Only use ".gff3" if using CHM13. Pipeline has an option to handle this, see `Pipeline parameters for STEP 2`.
+
+## Pipeline parameters for STEP c (Single-cell preprocessing -- merge all fastqs for single sample together)
+
+	 --step				<"c". Performs step c>
+
+	 --ont_reads_fq_dir		<path to directory of fastq sequencing data. If you don't specify this parameter the pipeline will not run.>
+
+	 --sample_id_table		<tab separated table of folder name to sample id so that data with the same sample id are concatted together.>
           
 ## Pipeline parameters for STEP 0 (Single-cell preprocessing)
 

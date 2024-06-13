@@ -6,13 +6,13 @@ log.info """
  ==============================================================================================================
  nanopore fastq files                                           : ${params.ont_reads_fq}
  nanopore fastq file directory					: ${params.ont_reads_fq_dir}
- demultiplex name						: ${params.demultiplex_name}
  nanopore sequencing summary files                              : ${params.ont_reads_txt}
  reference genome                                               : ${params.ref}
  reference annotation                                           : ${params.annotation}
  housekeeping genes 3' bias assessment                          : ${params.housekeeping}
  nanopore library prep kit                                      : ${params.cdna_kit}
  multiqc configuration file                                     : ${params.multiqc_config}
+ minimum threshold for mapped reads				: ${params.mapped_reads_thresh}
 
  reference genome is CHM13                                      : ${params.is_chm13}
  transcript discovery status                                    : ${params.is_discovery}
@@ -26,8 +26,10 @@ log.info """
 
  MAPQ value for filtering bam file                              : ${params.mapq}
 
- Step: 0 = pre processing 1 = basecalling, 
-       2 = mapping, 3 = quantification         			: ${params.step}
+ Step: c = concat across flowcells, 0 = pre processing, 
+       1 = basecalling, 2 = mapping, 3 = quantification		: ${params.step}
+
+ Sample id table						: ${params.sample_id_table}
 
  Path to pre-processed bambu RDS files                          : ${params.bambu_rds}
  Path to QC files that go into MultiQC report                   : ${params.multiqc_input}   
@@ -50,7 +52,7 @@ include {NANOPORE_STEP_4} from '../sub_workflows/nanopore_workflow_STEP_4'
 
 
 // Define initial files and channels
-ont_reads_fq_dir = Channel.fromPath(params.ont_reads_fq_dir)
+ont_fq_to_merge = Channel.value(params.ont_fq_to_merge)
 ont_reads_fq = Channel.fromPath(params.ont_reads_fq).map { file -> tuple(file.baseName, file) }
 ont_reads_txt = Channel.fromPath(file(params.ont_reads_txt))
 ref = file(params.ref)
@@ -62,6 +64,7 @@ basecall_id = Channel.from(params.basecall_id)
 cdna_kit = Channel.value(params.cdna_kit)
 multiqc_config = Channel.fromPath(params.multiqc_config)
 NDR = Channel.value(params.NDR)
+mapped_reads_thresh = Channel.value(params.mapped_reads_thresh)
 track_reads = Channel.value(params.track_reads)
 mapq = Channel.value(params.mapq)
 bambu_rds = Channel.fromPath(params.bambu_rds)
@@ -70,8 +73,8 @@ fai = file(params.fai)
 bam = Channel.fromPath(params.bam).map { file -> tuple(file.baseName, file) } 
 bai = Channel.fromPath(params.bai)
 contamination_ref = Channel.fromPath(params.contamination_ref)
-demultiplex_name = params.demultiplex_name
-sampleIDtable = params.sampleIDtable
+sample_id_table = params.sample_id_table
+use_split = params.use_split.toBoolean()
 
 
 if (params.ercc != "None") {
@@ -103,26 +106,35 @@ if ((params.bam != "None") && (params.bai != "None")) {
     
     }
 
+if (use_split == true) {
+    ont_reads_fq_dir = params.ont_reads_fq_dir
+    } 
+else {
+    ont_reads_fq_dir = Channel.fromPath(params.ont_reads_fq_dir + "/*.fastq.gz").flatten()
+}
+
 workflow {
-    if(params.step == 0){
-	if(params.sampleIDtable != "None"){
-		ont_reads_fq_dir = Channel.value(params.ont_reads_fq_dir)
-		MERGE_FLOWCELL(sampleIDtable, ont_reads_fq_dir)
-	}else {
-		NANOPORE_STEP_0(ont_reads_fq_dir, demultiplex_name)
-	}
-    }else if (params.step == 1){
+    if ((params.step == 'c') || (params.step == 'C')) {	
+	MERGE_FLOWCELL(sample_id_table, ont_fq_to_merge)
+    }
+ 
+    else if (params.step == 0) {
+	NANOPORE_STEP_0(ont_reads_fq_dir, sample_id_table, use_split)
+    } 
+
+    else if (params.step == 1) {
         NANOPORE_STEP_1(fast5_dir, basecall_config, basecall_id)
     }
 
-    else if ((params.step == 2) && (params.bam == "None")){
+    else if ((params.step == 2) && (params.bam == "None")) {
+	println params.is_dRNA
 
-        if (params.is_dRNA == "False") {
+        if (params.is_dRNA == false) {
         
-            NANOPORE_cDNA_STEP_2(ref, annotation, housekeeping, ont_reads_txt, ont_reads_fq, ercc, cdna_kit, track_reads, mapq, contamination_ref)
+            NANOPORE_cDNA_STEP_2(ref, annotation, housekeeping, ont_reads_txt, ont_reads_fq, ercc, cdna_kit, track_reads, mapq, contamination_ref, mapped_reads_thresh)
         }
 
-        else if (params.is_dRNA = "True") {
+        else {
 
             NANOPORE_dRNA_STEP_2(ref, annotation, housekeeping, ont_reads_txt, ont_reads_fq, ercc, cdna_kit, track_reads, mapq, contamination_ref)
 
@@ -137,8 +149,7 @@ workflow {
     }
 
     else if(params.step == 3){
-        
-        NANOPORE_STEP_3(ref, fai, annotation, NDR, track_reads, bambu_rds, multiqc_input, multiqc_config, demultiplex_name)
+        NANOPORE_STEP_3(ref, fai, annotation, NDR, track_reads, bambu_rds, multiqc_input, multiqc_config)
     }
 
     else if(params.step == 4){

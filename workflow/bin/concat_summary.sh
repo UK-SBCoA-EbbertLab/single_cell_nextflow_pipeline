@@ -16,17 +16,26 @@ while IFS=$'\t' read -r folder_id sample_id; do
 
     echo "${directory}${folder_id}"
 
+    txt_files=$(find "${directory}${folder_id}" -name "*.txt")
+    if [ -z "$txt_files" ]; then
+        echo "No .txt files found in ${directory}${folder_id}. Exiting..."
+    else
+
     # Find and concatenate files based on folder_id
-    for file in $(find "${directory}${folder_id}" -name "*.txt" | sort); do
-        echo $file
-        if [ "$first_file" = true ]; then
-            # Copy the entire content of the first file
-            cat "$file" >> "$output_file"
-            first_file=false
-        else
-            # Append file content except the first line to the output file
-            sed '1d' "$file" >> "$output_file"
-        fi
-    done
+        for file in $(echo "$txt_files" | sort); do
+            echo $file
+  	    if [ ! -f ${file} ]; then
+    		echo '${file} does not exist, skipping...'
+    	    fi
+            if [ "$first_file" = true ]; then
+                # Copy the entire content of the first file
+                cat "$file" >> "$output_file"
+                first_file=false
+            else
+                # Append file content except the first line to the output file
+                sed '1d' "$file" >> "$output_file"
+            fi
+        done
+    fi
 done < "$tsv_file"
 

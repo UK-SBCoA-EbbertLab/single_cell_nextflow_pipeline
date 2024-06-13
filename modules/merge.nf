@@ -13,33 +13,50 @@ process MERGE_MATRICES {
 		merge_matrices.py ${directory} ${name}
 	"""
 }
+
+process SEP_DIR_BY_SAMP {
+	label 'small'
+	
+	input:
+		path sample_id_table
+	output:
+		path("*.txt"), emit: dir_by_samp
+	script:
+	"""
+		awk '{ print > \$2 "_samp_to_dir.txt" }' ${sample_id_table}
+	"""
+
+}
+
 process MERGE_SUMMARY {
 	label 'medium'
 
-	publishDir "results/${params.out_dir}/summary_files/", pattern: "*.txt", mode: "copy", overwrite: true
+	publishDir "results/${params.out_dir}/pre_processing/summary_files/", pattern: "*.txt", mode: "copy", overwrite: true
 
 	input:
-		path sampleIDtable
-		val ont_reads_fq_dir
+		path dir_by_samp
+		val ont_fq_to_merge
 	output:
 		path("*.txt"), emit: out
 	script:
 	"""
-		concat_summary.sh ${sampleIDtable} ${ont_reads_fq_dir}
+		concat_summary.sh ${dir_by_samp} ${ont_fq_to_merge}
 	"""
 }
 process MERGE_FASTQ {
 	label 'large'
 
-	publishDir "results/${params.out_dir}/merged_fastq/", pattern: "*.fastq", mode: "copy", overwrite: true
+	publishDir "results/${params.out_dir}/pre_processing/merged_fastq/", mode: "copy", overwrite: true
 
 	input:
-		path sampleIDtable
-		val ont_reads_fq_dir
+		path dir_by_samp
+		val ont_fq_to_merge
 	output:
-		path("*.fastq"), emit: out
+		path("*.fastq.gz"), emit: out
+		path("*.fastq"), emit: fastq
 	script:
 	"""
-		java -cp /scratch/bjwh228/working_single_cell_pipeline/workflow/bin/UnzipAndConcat-Java/ UnzipAndConcat ${sampleIDtable} ${ont_reads_fq_dir}
+		java -cp /pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/workflow/bin/UnzipAndConcat-Java/ UnzipAndConcat ${dir_by_samp} ${ont_fq_to_merge}
+		gzip -k *.fastq
 	"""
 }
