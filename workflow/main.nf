@@ -53,6 +53,7 @@ include {NANOPORE_STEP_4} from '../sub_workflows/nanopore_workflow_STEP_4'
 
 // Define initial files and channels
 ont_fq_to_merge = Channel.value(params.ont_fq_to_merge)
+ont_reads_fq_dir = params.ont_reads_fq_dir
 ont_reads_fq = Channel.fromPath(params.ont_reads_fq).map { file -> tuple(file.baseName, file) }
 ont_reads_txt = Channel.fromPath(file(params.ont_reads_txt))
 ref = file(params.ref)
@@ -74,7 +75,6 @@ bam = Channel.fromPath(params.bam).map { file -> tuple(file.baseName, file) }
 bai = Channel.fromPath(params.bai)
 contamination_ref = Channel.fromPath(params.contamination_ref)
 sample_id_table = params.sample_id_table
-use_split = params.use_split.toBoolean()
 
 
 if (params.ercc != "None") {
@@ -106,20 +106,13 @@ if ((params.bam != "None") && (params.bai != "None")) {
     
     }
 
-if (use_split == true) {
-    ont_reads_fq_dir = params.ont_reads_fq_dir
-    } 
-else {
-    ont_reads_fq_dir = Channel.fromPath(params.ont_reads_fq_dir + "/*.fastq.gz").flatten()
-}
-
 workflow {
     if ((params.step == 'c') || (params.step == 'C')) {	
 	MERGE_FLOWCELL(sample_id_table, ont_fq_to_merge)
     }
  
     else if (params.step == 0) {
-	NANOPORE_STEP_0(ont_reads_fq_dir, sample_id_table, use_split)
+	NANOPORE_STEP_0(ont_reads_fq_dir, sample_id_table)
     } 
 
     else if (params.step == 1) {

@@ -6,30 +6,31 @@ import java.util.zip.*;
 public class modified_UnzipAndConcat {
     public static void main(String[] args) {
         // Check if the TSV file is provided
-        if (args.length != 1) {
-            System.out.println("Usage: java UnzipAndConcat <output filename>");
+        if (args.length != 2) {
+            System.out.println("Usage: java UnzipAndConcat <file extension> <output filename>");
             System.exit(1);
         }
 
 	String directory = System.getProperty("user.dir");
         System.out.println("Current working directory: " + directory);
 
-	String fileName = args[0];
+	String fileExtension = args[0];
+	String fileName = args[1];
         try {
             String currentDirectory = directory;
             // Extract .gz files
-            extractGzFiles(currentDirectory);
+            extractGzFiles(currentDirectory, fileExtension);
             // Concatenate .fastq files for this sample
-            concatenateFastqFiles(currentDirectory, fileName);
+            concatenateFastqFiles(currentDirectory, fileExtension, fileName);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private static void extractGzFiles(String directory) throws IOException {
+    private static void extractGzFiles(String directory, String extension) throws IOException {
         Files.walk(Paths.get(directory))
                 .filter(Files::isRegularFile)
-                .filter(path -> path.toString().endsWith(".fastq.gz"))
+                .filter(path -> path.toString().endsWith(extension + ".gz"))
                 .forEach(path -> {
                     try {
 			System.out.println(path);
@@ -40,12 +41,12 @@ public class modified_UnzipAndConcat {
                 });
     }
 
-    private static void concatenateFastqFiles(String directory, String fileName) throws IOException {
+    private static void concatenateFastqFiles(String directory, String extension, String fileName) throws IOException {
         String outputFile = fileName;
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile, true))) {
             Files.walk(Paths.get(directory))
                     .filter(Files::isRegularFile)
-                    .filter(path -> path.toString().endsWith(".fastq"))
+                    .filter(path -> path.toString().endsWith(extension))
 		    .sorted(Comparator.comparing(Path::toString))
                     .forEach(path -> {
 			System.out.println(path);

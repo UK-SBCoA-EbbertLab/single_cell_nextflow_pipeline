@@ -30,6 +30,7 @@ public class UnzipAndConcat {
                 concatenateFastqFiles(currentDirectory, sampleId);
             } catch (IOException e) {
                 e.printStackTrace();
+		System.exit(1);
             }
         });
     }
@@ -47,6 +48,7 @@ public class UnzipAndConcat {
             }
         } catch (IOException e) {
             e.printStackTrace();
+	    System.exit(1);
         }
         return sampleToFolderMap;
     }
@@ -60,6 +62,7 @@ public class UnzipAndConcat {
                         GunzipFile(path);
                     } catch (IOException e) {
                         e.printStackTrace();
+			System.exit(1);
                     }
                 });
     }
@@ -79,6 +82,7 @@ public class UnzipAndConcat {
                             }
                         } catch (IOException e) {
                             e.printStackTrace();
+			    System.exit(1);
                         }
                     });
         }

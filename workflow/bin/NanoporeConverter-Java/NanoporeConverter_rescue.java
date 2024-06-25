@@ -10,7 +10,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-public class NanoporeConverter {
+public class NanoporeConverter_rescue {
 
     private static final String REVERSE_MAP = "ACGTacgt";
     private static final String REVERSE_COMPLEMENT_MAP = "TGCATGCA";
@@ -55,12 +55,13 @@ public class NanoporeConverter {
 
     public static void main(String[] args) {
         // Check if correct number of arguments provided
-        if (args.length != 1) {
-            System.err.println("Usage: NanoporeConverter <inputFastq>");
+        if (args.length != 2) {
+            System.err.println("Usage: NanoporeConverter_rescue <inputFastq> <barcodes>");
             System.exit(1);
         }
 
         File fastqFile = new File(Paths.get(args[0]).toAbsolutePath().toString());
+        Set<String> barcodeSet = getBarcodeWhitelist(Paths.get(args[1]).toAbsolutePath().toString());
 
         ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         List<Future<?>> futures = new ArrayList<>();
@@ -83,8 +84,8 @@ public class NanoporeConverter {
 			String baseFileName = getBaseName(fileName);
 
         		// Prepare output files for writing
-		        String r1Out = baseFileName + "_standard_R1.fastq.gz";
-		        String r2Out = baseFileName + "_standard_R2.fastq.gz";
+		        String r1Out = baseFileName + "_standard_R1_rescued.fastq.gz";
+		        String r2Out = baseFileName + "_standard_R2_rescued.fastq.gz";
 //			System.out.println(r1Out);
 //			System.out.println(r2Out);
 
@@ -125,7 +126,7 @@ public class NanoporeConverter {
             			System.exit(1);
 			}
 
-                    convertNanopore(fastqFile, r1Out, r2Out, baseFileName);
+                    convertNanopore(fastqFile, barcodeSet, r1Out, r2Out, baseFileName);
                 } catch (IOException e) {
                     System.err.println("Error processing file: " + fastqFile.getName() + ". Error: " + e.getMessage());
 		    e.printStackTrace();
@@ -157,24 +158,38 @@ public class NanoporeConverter {
 	
     }
 
+    private static Set<String> getBarcodeWhitelist(String barcodeFile) {
+	Set<String> lines = new HashSet<>();
+        
+        try (GZIPInputStream gzipInputStream = new GZIPInputStream(new FileInputStream(barcodeFile));
+             BufferedReader reader = new BufferedReader(new InputStreamReader(gzipInputStream))) {
+            
+            String line;
+            while ((line = reader.readLine()) != null) {
+                lines.add(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+	    System.exit(1);
+        }
+        
+        return lines;
+    }
+
     /**
      * Converts Nanopore FASTQ files to standard paired-end Illumina format.
      * @param inputFastq - The FASTQ file to convert.
      * @throws IOException if an error occurs during file operations.
      */
-    public static void convertNanopore(File fastqFile, String r1Out, String r2Out, String fileBaseName) throws IOException {
+    public static void convertNanopore(File fastqFile, Set<String> barcodes, String r1Out, String r2Out, String fileBaseName) throws IOException {
             List<String> r1Buffer = new ArrayList<>();
             List<String> r2Buffer = new ArrayList<>();
             List<String> skippedBuffer = new ArrayList<>();
             List<String> skippedStatsBuffer = new ArrayList<>();
-            List<String> barcodeWhitelist = new ArrayList<>();
 //	    System.out.println(fastqFile);
 
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(fastqFile))))) {
                 String line;
-		// TODO: double check what the pattern needs to be for this
-	//	int i = Integer.parseInt(fastqFile.getName().replaceAll("[^\\d]", ""));
-		//int i = Integer.parseInt(fastqFile.getName().split("_")[1].replaceAll("[^\\d]", ""));
                 int idx = 0;
                 boolean skipRead = false;
                 int r1StartPos = 0, r1EndPos = 0, r2StartPos = 0;
@@ -246,6 +261,15 @@ public class NanoporeConverter {
 
                         if (found) {
 		            if (!barcode.isAmbiguous) {
+				System.out.println("WHY IS IT NOT AMBIGUOUS NOW???");
+				System.out.println("I THINK THIS MIGHT BE DUE TO A LENGTH ISSUE");
+				System.out.println(line);
+			        n_skipped_reads += 1;
+                                skipRead = true;
+			    } else {
+				barcode.rescueBarcode(barcodes);
+				System.out.println(barcode.pBarcode);
+
 		    		r2StartPos = r1EndPos + 31;
 				System.out.println("r1StartPos: " + r1StartPos + "\nr1EndPos: " + r1EndPos + "\nr2StartPos: " + r2StartPos + "\nline length: " +line.length());
 
@@ -267,10 +291,6 @@ public class NanoporeConverter {
 			            n_skipped_reads += 1;
                                     skipRead = true;
                                 }
-			    } else {
-				n_skipped_reads += 1;
-				n_ambiguous_barcode += 1;
-				skipRead = true;
 			    }
                         } else {
 			    n_skipped_reads += 1;
@@ -299,8 +319,6 @@ public class NanoporeConverter {
                             r2Buffer.add(getReverseComplement(r2Sequence));
                             r2Buffer.add("+");
                             r2Buffer.add(new StringBuilder(r2Qual).reverse().toString());
-			    
-			    barcodeWhitelist.add(barcode.pBarcode);
 
 			    if (firstTime) {
 				    System.out.println(readHeader);
@@ -345,7 +363,6 @@ public class NanoporeConverter {
             	appendToFile(r2Out, String.join("\n", r2Buffer) + "\n");
 		appendToFile(fileBaseName + "_skippedReads.fastq.dontuse.gz", String.join("\n", skippedBuffer) + "\n");
 		appendToFile(fileBaseName + "_skippedReads.stats.gz", String.join("\n", skippedStatsBuffer) + "\n");
-		appendToFile(fileBaseName + "_barcodeWhitelist.txt.gz", String.join("\n", barcodeWhitelist) + "\n");
             }
     }
 
