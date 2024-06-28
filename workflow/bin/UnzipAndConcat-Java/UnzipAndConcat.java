@@ -57,6 +57,14 @@ public class UnzipAndConcat {
         Files.walk(Paths.get(directory))
                 .filter(Files::isRegularFile)
                 .filter(path -> path.toString().endsWith(".fastq.gz"))
+		.filter(path -> {
+			try {
+				return Files.size(path) > 0;
+			} catch (IOException e) {
+				e.printStackTrace();
+				return false; // Skip the file if there is an issue getting its size
+			}
+	        })
                 .forEach(path -> {
                     try {
                         GunzipFile(path);
