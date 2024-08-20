@@ -5,7 +5,7 @@ process CONVERT_NANOPORE {
 	label 'huge'
 
 	input:
-		tuple val (sampName), path (input_fastq), val (baseName)
+		tuple val (sampName), val (baseName), path (input_fastqs)
 
 
 	output:
@@ -18,13 +18,14 @@ process CONVERT_NANOPORE {
 //	sampName = input_fastq.name.replaceAll(/\..*$/, "")
 	"""
 		echo "${sampName}"
-		echo "${input_fastq}"
+		echo "${baseName}"
 		java \
 		    -Xms300g \
 		    -Xmx400g \
 		    -cp /pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/workflow/bin/NanoporeConverter-Java/ \
 		    NanoporeConverter \
-		    ${input_fastq}
+		    ${sampName} \
+		    ${baseName}
 	"""
 }
 

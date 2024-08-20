@@ -32,7 +32,7 @@ workflow NANOPORE_STEP_0 {
 
         main:
 		SEP_DIR_BY_SAMP(sample_id_table)
-			
+
 		// create a channel with directories for each sample
 		ch_samples = SEP_DIR_BY_SAMP.out.dir_by_samp.flatten()
 			.flatMap { sampleFile -> 
@@ -55,10 +55,20 @@ workflow NANOPORE_STEP_0 {
 				}
 				.collect { file -> 
 					def fileName = file.name
-					def baseName = fileName - '.fastq.gz'  // Remove the extension
-					[sampName, file, baseName]  // Return the tuple with the sample name, file, and base name
+					[sampName, file]  // Return the tuple with the sample name, file
 				}
 			}
+			.groupTuple()
+			.flatMap { sampName, items -> {
+				def counter = 0
+				items.collate(200).collect { group ->
+					counter += 1
+					def files = group.collect { it }
+					[sampName, counter, files]
+					}
+				}
+			}
+
 	
 		CONVERT_NANOPORE(ch_files)
 		

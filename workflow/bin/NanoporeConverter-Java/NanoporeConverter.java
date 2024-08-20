@@ -59,13 +59,12 @@ public class NanoporeConverter {
 
 	public static void main(String[] args) {
 		// Check if correct number of arguments provided
-		if (args.length != 1) {
-			System.err.println("Usage: NanoporeConverter <inputFastq>");
+		if (args.length != 2) {
+			System.err.println("Usage: NanoporeConverter <sampName> <counter>");
 			System.exit(1);
 		}
 
-		Path currentDir = Paths.get(".");
-		File[] fastqFiles = new File(currentDir).listFiles((dir, name) -> name.endsWith(".fastq.gz"));
+		File[] fastqFiles = new File(".").listFiles((dir, name) -> name.endsWith(".fastq.gz"));
 
 //		File fastqFile = new File(Paths.get(args[0]).toAbsolutePath().toString());
 
@@ -86,12 +85,10 @@ public class NanoporeConverter {
 		Future<?> future = executor.submit(() -> {
 			try {
 //			System.out.println(fastqFile);
-				String fileName = fastqFile.getName();
-				String baseFileName = getBaseName(fileName);
-
 				// Prepare output files for writing
-				String r1Out = baseFileName + "_standard_R1.fastq.gz";
-				String r2Out = baseFileName + "_standard_R2.fastq.gz";
+				String fileBaseName = args[0] + "_" + args[1];
+				String r1Out = fileBaseName + "_standard_R1.fastq.gz";
+				String r2Out = fileBaseName + "_standard_R2.fastq.gz";
 //			System.out.println(r1Out);
 //			System.out.println(r2Out);
 
@@ -116,25 +113,27 @@ public class NanoporeConverter {
 //			System.out.println(fastqFile);
 
 				// Clear or initialize output files
-				try {
-					clearFile(r1Out);
-				} catch (IOException e) {
-					System.err.println("An error occurred while clearing the file: " + r1Out);
-					e.printStackTrace();
-					System.exit(1);
-				}
+//				try {
+//					clearFile(r1Out);
+//				} catch (IOException e) {
+//					System.err.println("An error occurred while clearing the file: " + r1Out);
+//					e.printStackTrace();
+//					System.exit(1);
+//				}
+//
+//				try {
+//					clearFile(r2Out);
+//				} catch (IOException e) {
+//					System.err.println("An error occurred while clearing the file: " + r2Out);
+//					e.printStackTrace();
+//					System.exit(1);
+//				}
 
-				try {
-					clearFile(r2Out);
-				} catch (IOException e) {
-					System.err.println("An error occurred while clearing the file: " + r2Out);
-					e.printStackTrace();
-					System.exit(1);
+				for (File fastqFile : fastqFiles) {
+					convertNanopore(fastqFile, r1Out, r2Out, fileBaseName);
 				}
-
-				convertNanopore(fastqFile, r1Out, r2Out, baseFileName);
 			} catch (IOException e) {
-				System.err.println("Error processing file: " + fastqFile.getName() + ". Error: " + e.getMessage());
+				System.err.println("Error processing files: " + fastqFiles.toString() + ". Error: " + e.getMessage());
 				e.printStackTrace();
 				System.exit(1);
 			}
@@ -205,6 +204,8 @@ public class NanoporeConverter {
 
 			// Instantiate the barcode class
 			pBarcode barcode = new pBarcode();
+			String fileName = fastqFile.getName();
+			String baseFileName = getBaseName(fileName);
 
 			// Processing each line of the file
 			while ((line = reader.readLine()) != null) {
@@ -318,7 +319,7 @@ public class NanoporeConverter {
 						String r2Qual = line.substring(r2StartPos).trim();
 
 						// add to the line header the file name the read is from and the number of the read that we are printing to the file
-						String readHeader = "@" + "file_" + fileBaseName + "_read_" + outReadIndex + " " + ogHeaderInfo;
+						String readHeader = "@" + "file_" + baseFileName + "_read_" + outReadIndex + " " + ogHeaderInfo;
 
 						// Add r1 to buffer
 						r1Buffer.add(readHeader);
@@ -349,7 +350,7 @@ public class NanoporeConverter {
 						outReadIndex += 1;
 					} else {
 						// if the read is skipped for whatever reason, add the read to the skippedBuffer
-						String readHeader = "@file_" + fileBaseName + " " + ogHeaderInfo;
+						String readHeader = "@file_" + baseFileName + " " + ogHeaderInfo;
 						skippedBuffer.add(readHeader);
 						skippedBuffer.add(r2Sequence);
 						skippedBuffer.add("+");
@@ -364,7 +365,7 @@ public class NanoporeConverter {
 			// after we are done going through all the reads, we want to add the skipped stats to their buffer 
 			skippedStatsBuffer.add("Filename\tTotalReads\tSkippedReads\tAmbiguousBarcodes");
 			skippedStatsBuffer
-					.add(fileBaseName + "\t" + n_total_reads + "\t" + n_skipped_reads + "\t" + n_ambiguous_barcode);
+					.add(baseFileName + "\t" + n_total_reads + "\t" + n_skipped_reads + "\t" + n_ambiguous_barcode);
 			System.out.println(skippedStatsBuffer);
 		} catch (IOException e) {
 			System.err.println("Error processing file: " + fastqFile.getName() + ". Error: " + e.getMessage());
