@@ -7,14 +7,13 @@
 #SBATCH --partition=normal
 #SBATCH -e slurm-%j.err
 #SBATCH -o slurm-%j.out
-#SBATCH -A coa_mteb223_uksr
+#SBATCH -A cca_mteb223_uksr
 
 nextflow ../../workflow/main.nf \
         --sample_id_table "/pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/datasets/test_data/TCell_test/test_sample_id_to_folder.tsv" \
-	--ont_reads_fq_dir "results/Tcell_test/pre_processing/merged_fastq/" \
-	--use_split false \
-        --out_dir "Tcell_test_nosplit" \
-        --demultiplex_name "Tcell_test_nosplit" \
-        --step 0 #\
-#	-resume #\
+	--ont_reads_fq_dir "/pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/datasets/test_data/TCell_test/" \
+        --out_dir "Tcell_test" \
+        --demultiplex_name "Tcell_test" \
+        --step 0 \
+	-resume #\
 	#--ont_reads_fq_dir "/pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/datasets/test_data/TCell_test/" \

@@ -1,6 +1,6 @@
 process DEMULTIPLEX {
 	
-        publishDir "results/${params.out_dir}/pre_processing/demultiplexed/${sampName}/${baseName}", mode: "copy", overwrite: true
+       // publishDir "results/${params.out_dir}/pre_processing/demultiplexed/${sampName}/${baseName}", mode: "copy", overwrite: true
 
 	label 'barcoding'
 

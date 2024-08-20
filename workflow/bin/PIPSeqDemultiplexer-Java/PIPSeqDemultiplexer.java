@@ -5,13 +5,10 @@ import java.util.zip.*;
 import java.io.*;
 import java.util.concurrent.*;
 
-
 public class PIPSeqDemultiplexer {
-
 	private static final Map<Path, StringBuilder> fileBuffers = new HashMap<>();
 	private static final Map<Path, Integer> fileBufferCurrentReadCount = new HashMap<>();
 	private static final Map<Path, Integer> fileBufferPrintedReadCount = new HashMap<>();
-
 
 	public static void demultiplexPips(String fastqR1, String fastqR2, String sampleName, String baseName) {
 
@@ -20,11 +17,11 @@ public class PIPSeqDemultiplexer {
 
 		if (Files.exists(path1) && Files.exists(path2)) {
 			try {
-				//				long size1 = Files.size(path1);
-				//				long size2 = Files.size(path2);
+				// long size1 = Files.size(path1);
+				// long size2 = Files.size(path2);
 
-				//				System.out.println("Size of " + fastqR1 + ": " + size1 + " bytes");
-				//				System.out.println("Size of " + fastqR2 + ": " + size2 + " bytes");
+				// System.out.println("Size of " + fastqR1 + ": " + size1 + " bytes");
+				// System.out.println("Size of " + fastqR2 + ": " + size2 + " bytes");
 
 				processFiles(fastqR1, fastqR2, sampleName, baseName);
 			} catch (IOException e) {
@@ -50,28 +47,30 @@ public class PIPSeqDemultiplexer {
 		flushAllBuffers();
 	}
 
-	public static void processFiles(String fastqR1, String fastqR2, String sampleName, String baseName) throws IOException {
+	public static void processFiles(String fastqR1, String fastqR2, String sampleName, String baseName)
+			throws IOException {
 
 		String f1ReadName, f1Seq, f2ReadName;
 
 		/*
 		 * This String array should have four entries (one per line in a read)
 		 */
-		String[] f1Read, f2Read; 
+		String[] f1Read, f2Read;
 
 		try {
-			BufferedReader file1Reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(fastqR1))));
-			BufferedReader file2Reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(fastqR2))));
+			BufferedReader file1Reader = new BufferedReader(
+					new InputStreamReader(new GZIPInputStream(new FileInputStream(fastqR1))));
+			BufferedReader file2Reader = new BufferedReader(
+					new InputStreamReader(new GZIPInputStream(new FileInputStream(fastqR2))));
 
 			int readsProcessed = 0;
 
-			while(true){
+			while (true) {
 
-				if(readsProcessed % 1000000 == 0) {
-					System.out.println("Processed " +
-							NumberFormat.getNumberInstance(Locale.US).format(readsProcessed) +
-							" reads (" + NumberFormat.getNumberInstance(Locale.US).format(readsProcessed * 4) +
-							" lines) in " + fastqR1 + "...");
+				if (readsProcessed % 1000 == 0) {
+					System.out.println("Processed " + NumberFormat.getNumberInstance(Locale.US).format(readsProcessed)
+							+ " reads (" + NumberFormat.getNumberInstance(Locale.US).format(readsProcessed * 4)
+							+ " lines) in " + fastqR1 + "...");
 				}
 
 				f1Read = getNextRead(file1Reader);
@@ -79,7 +78,7 @@ public class PIPSeqDemultiplexer {
 				/*
 				 * getNextRead will return null if we've reached the end
 				 */
-				if(f1Read == null) {
+				if (f1Read == null) {
 					break;
 				}
 
@@ -91,9 +90,8 @@ public class PIPSeqDemultiplexer {
 				f2ReadName = f2Read[0];
 
 				/*
-				 * file1 and file2 should match exactly in number of reads and
-				 * in the order. If they are ever out of sync, then something
-				 * is wrong.
+				 * file1 and file2 should match exactly in number of reads and in the order. If
+				 * they are ever out of sync, then something is wrong.
 				 */
 				if (!f1ReadName.equals(f2ReadName)) {
 					throw new IOException("ERROR: Expected a read but did not find one. Check"
@@ -115,7 +113,6 @@ public class PIPSeqDemultiplexer {
 
 	}
 
-
 	/**
 	 * Get the next read given the file reader. Will return a String[] with four
 	 * entries (one for each line of the read).
@@ -129,22 +126,22 @@ public class PIPSeqDemultiplexer {
 		String[] linesForRead = new String[4];
 		String line;
 		line = fileReader.readLine();
-		if(line != null) {
+		if (line != null) {
 			linesForRead[0] = line;
 			linesForRead[1] = fileReader.readLine();
 			linesForRead[2] = fileReader.readLine();
 			linesForRead[3] = fileReader.readLine();
 
 			return linesForRead;
-		} 
+		}
 
 		return null;
 	}
 
 	/**
-	 * The method through which all processes add to the same buffer. This would
-	 * be faster if we used a concurrent data structure rather than synchronizing 
-	 * the entire method, but this is working well enough.
+	 * The method through which all processes add to the same buffer. This would be
+	 * faster if we used a concurrent data structure rather than synchronizing the
+	 * entire method, but this is working well enough.
 	 * 
 	 * @param path
 	 * @param lines
@@ -153,16 +150,15 @@ public class PIPSeqDemultiplexer {
 		try {
 			StringBuilder buffer = fileBuffers.getOrDefault(path, new StringBuilder());
 			Integer currentBufferReadCount = fileBufferCurrentReadCount.getOrDefault(path, 0);
-
+			
 			for (String line : lines) {
 				buffer.append(line).append("\n");
 			}
 
 			/*
-			 * Increment the number of reads in the buffer by one and store in
-			 * HashMap.
+			 * Increment the number of reads in the buffer by one and store in HashMap.
 			 */
-			currentBufferReadCount++; 
+			currentBufferReadCount++;
 			fileBufferCurrentReadCount.put(path, currentBufferReadCount);
 
 			fileBuffers.put(path, buffer);
@@ -175,22 +171,45 @@ public class PIPSeqDemultiplexer {
 	public static synchronized void flushBuffer(Path path, StringBuilder buffer) {
 		// Ensure the file extension is .gz
 		// if (!path.toString().endsWith(".gz")) {
-		//     path = Paths.get(path.toString() + ".gz");
+		// path = Paths.get(path.toString() + ".gz");
 		// }
 
-		try (GZIPOutputStream gzipOutputStream = new GZIPOutputStream(new FileOutputStream(path.toFile(), true))) {
-		//try (FileOutputStream outputStream = new FileOutputStream(path.toFile(), true)) {
-			//gzipOutputStream.write(buffer.toString().getBytes());
+		try (GZIPOutputStream gzipOutputStream = new GZIPOutputStream(new FileOutputStream(path.toFile()))) {
+			// try (FileOutputStream outputStream = new FileOutputStream(path.toFile(),
+			// true)) {
+			// gzipOutputStream.write(buffer.toString().getBytes());
 			gzipOutputStream.write(buffer.toString().getBytes());
 			buffer.setLength(0);
 			/*
-			 * Track how many reads have been written to/from this buffer so
-			 * far. Also reset the number of reads left in the buffer to zero.
+			 * Track how many reads have been written to/from this buffer so far. Also reset
+			 * the number of reads left in the buffer to zero.
 			 */
-			Integer bufferPrintedReadsSoFar = fileBufferPrintedReadCount.getOrDefault(path, Integer.valueOf(0)); // Get how many have already been printed to file
-			Integer currentBufferReadCount = fileBufferCurrentReadCount.getOrDefault(path, Integer.valueOf(0));  // Get how many reads were in the buffer before printing
-			fileBufferPrintedReadCount.put(path, bufferPrintedReadsSoFar + currentBufferReadCount);              // Set the number of reads printed to be what was previously printed plus what was just printed
-			fileBufferCurrentReadCount.put(path, 0);															 // Set the number of reads left in the buffer to zero.
+			Integer bufferPrintedReadsSoFar = fileBufferPrintedReadCount.getOrDefault(path, Integer.valueOf(0)); // Get
+																													// how
+																													// many
+																													// have
+																													// already
+																													// been
+																													// printed
+																													// to
+																													// file
+			Integer currentBufferReadCount = fileBufferCurrentReadCount.getOrDefault(path, Integer.valueOf(0)); // Get
+																												// how
+																												// many
+																												// reads
+																												// were
+																												// in
+																												// the
+																												// buffer
+																												// before
+																												// printing
+			fileBufferPrintedReadCount.put(path, bufferPrintedReadsSoFar + currentBufferReadCount); // Set the number of
+																									// reads printed to
+																									// be what was
+																									// previously
+																									// printed plus what
+																									// was just printed
+			fileBufferCurrentReadCount.put(path, 0); // Set the number of reads left in the buffer to zero.
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -198,31 +217,29 @@ public class PIPSeqDemultiplexer {
 		}
 	}
 
-
 	/**
 	 * Flush remaining buffers where the total number of reads (including those
-	 * previously printed) meet our inclusion criteria. This ensures we don't 
-	 * throw out any reads that remain if the given buffer has already been
-	 * printed out.
+	 * previously printed) meet our inclusion criteria. This ensures we don't throw
+	 * out any reads that remain if the given buffer has already been printed out.
 	 */
 	public static synchronized void flushAllBuffers() {
 
 		int bufferPrintedReadsSoFar, currentBufferReadCount;
 		System.out.println("In the flush buffer function");
-		for (Map.Entry<Path, StringBuilder> entry: fileBuffers.entrySet()) {
+		for (Map.Entry<Path, StringBuilder> entry : fileBuffers.entrySet()) {
 
-			/* 
-			 * Get how many have already been printed to file. Must allow default
-			 * of zero here because only those that have already printed to a file
-			 * will be in this map.
+			/*
+			 * Get how many have already been printed to file. Must allow default of zero
+			 * here because only those that have already printed to a file will be in this
+			 * map.
 			 */
 			bufferPrintedReadsSoFar = fileBufferPrintedReadCount.getOrDefault(entry.getKey(), Integer.valueOf(0));
-			/* 
-			 * Get how many reads are in the buffer. Do not allow a default here,
-			 * because if if the current buffer doesn't already exist in the map,
-			 * something has gone wrong elsewhere.
+			/*
+			 * Get how many reads are in the buffer. Do not allow a default here, because if
+			 * if the current buffer doesn't already exist in the map, something has gone
+			 * wrong elsewhere.
 			 */
-			currentBufferReadCount = fileBufferCurrentReadCount.get(entry.getKey());  
+			currentBufferReadCount = fileBufferCurrentReadCount.get(entry.getKey());
 
 			flushBuffer(entry.getKey(), entry.getValue());
 		}
@@ -263,7 +280,6 @@ public class PIPSeqDemultiplexer {
 		}
 	}
 
-
 	public static int countLines(String buffer) {
 		int lines = 0;
 		int length = buffer.length();
@@ -292,5 +308,4 @@ public class PIPSeqDemultiplexer {
 		demultiplexPips(fastqR1, fastqR2, sampleName, baseName);
 	}
 
-
-	}
+}

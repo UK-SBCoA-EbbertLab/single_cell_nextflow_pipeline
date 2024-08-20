@@ -12,7 +12,7 @@ process CONVERT_NANOPORE {
 		tuple val(sampName), val(baseName), path("*.fastq.gz"), emit: good
 		tuple val(sampName), path("*.stats.gz"),  emit: bad_stats
 		tuple val(sampName), val(baseName), path("*dontuse.gz"),  emit: to_rescue
-		tuple val(sampName), path("*.txt.gz"),  emit: barcodes
+		tuple val(sampName), path("*.ser.gz"),  emit: barcodes
 
 	script:
 //	sampName = input_fastq.name.replaceAll(/\..*$/, "")
@@ -37,15 +37,22 @@ process CAT_BARCODE_WHITELIST {
 	input:
 		tuple val(sampName), path(files)
 	output:
-		tuple val(sampName), path("*_barcodes.txt.gz")
+		tuple val(sampName), path("${sampName}_tier1map_barcodes.ser.gz"), path("${sampName}_tier2map_barcodes.ser.gz"), path("${sampName}_tier3map_barcodes.ser.gz"), path("${sampName}_tier4map_barcodes.ser.gz")
 	
 	script:
 	"""
-		java -cp /pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/workflow/bin/modified-UnzipAndConcat-Java/ modified_UnzipAndConcat ".txt" "${sampName}_barcodes"
-		mv "${sampName}_barcodes" "${sampName}_barcodes.txt"
-		# this is to get rid of any duplicates
-		awk -i inplace '!seen[\$0]++' "${sampName}_barcodes.txt"
-		gzip -k "${sampName}_barcodes.txt"
+		#java -cp /pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/workflow/bin/NanoporeConverter-Java/ combinedBarcodeWhitelists ${files}
+		java -cp /pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/workflow/bin/NanoporeConverter-Java/ combinedBarcodeWhitelists
+		mv tier1map_barcodes.ser.gz ${sampName}_tier1map_barcodes.ser.gz
+		mv tier2map_barcodes.ser.gz ${sampName}_tier2map_barcodes.ser.gz
+		mv tier3map_barcodes.ser.gz ${sampName}_tier3map_barcodes.ser.gz
+		mv tier4map_barcodes.ser.gz ${sampName}_tier4map_barcodes.ser.gz
+
+#		 java -cp /pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/workflow/bin/modified-UnzipAndConcat-Java/ modified_UnzipAndConcat ".txt" "${sampName}_barcodes"
+#		mv "${sampName}_barcodes" "${sampName}_barcodes.txt"
+#		# this is to get rid of any duplicates
+#		awk -i inplace '!seen[\$0]++' "${sampName}_barcodes.txt"
+#		gzip -k "${sampName}_barcodes.txt"
 	"""
 
 }
@@ -78,7 +85,7 @@ process CONVERT_NANOPORE_RESCUE {
 	label 'huge'
 
 	input:
-		tuple val(sampName), val(baseName), path(fastq_to_rescue), path(barcodes)
+		tuple val(sampName), val(baseName), path(fastq_to_rescue), path(barcodes_1), path(barcodes_2), path(barcodes_3), path(barcodes_4)
 
 	output:
 		tuple val(sampName), val(baseName_rescued), path("*.fastq.gz"), emit: good
@@ -95,7 +102,7 @@ process CONVERT_NANOPORE_RESCUE {
 		    -Xmx400g \
 		    -cp /pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/workflow/bin/NanoporeConverter-Java/ \
 		    NanoporeConverter_rescue \
-		    ${fastq_to_rescue} ${barcodes}
+		    ${fastq_to_rescue} ${barcodes_1} ${barcodes_2} ${barcodes_3} ${barcodes_4}
 	"""
 }
 
