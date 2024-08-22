@@ -52,7 +52,7 @@ process MERGE_FASTQ {
 		path dir_by_samp
 		val ont_fq_to_merge
 	output:
-		path("*.fastq.gz"), emit: out
+//		path("*.fastq.gz"), emit: out
 		path("*.fastq"), emit: fastq
 	script:
 	"""
