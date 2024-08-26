@@ -103,11 +103,18 @@ workflow NANOPORE_STEP_0 {
                                 def matcher = pattern.matcher(fileName)
                                 if (matcher.find()) {
                                 	def extractedPart = matcher.group(1)
-                                        return [sampName, extractedPart, file]
+					def pattern2 = ~/^([AGCT]{5})\w+$/
+					def matcher2 = pattern2.matcher(extractedPart)
+					if (matcher2.find()) {
+						def first5 = matcher2.group(1)
+	                                        return [sampName, first5, extractedPart, file]
+					}
 				}
 			}	
 			.groupTuple(by: [0,1])
 			.set { sorted_demultiplexed_files }
+
+//			sorted_demultiplexed_files.view()
 
 		COMBINE_DEMULTIPLEX(sorted_demultiplexed_files)
 }
