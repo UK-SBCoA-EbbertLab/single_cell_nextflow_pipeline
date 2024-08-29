@@ -52,11 +52,9 @@ process MERGE_FASTQ {
 		path dir_by_samp
 		val ont_fq_to_merge
 	output:
-//		path("*.fastq.gz"), emit: out
-		path("*.fastq"), emit: fastq
+		path("*.fastq")
 	script:
 	"""
 		java -cp /pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/workflow/bin/UnzipAndConcat-Java/ UnzipAndConcat ${dir_by_samp} ${ont_fq_to_merge}
-		gzip -k *.fastq
 	"""
 }

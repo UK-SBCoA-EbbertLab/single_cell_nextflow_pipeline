@@ -42,18 +42,12 @@ process CAT_BARCODE_WHITELIST {
 	
 	script:
 	"""
-		#java -cp /pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/workflow/bin/NanoporeConverter-Java/ combinedBarcodeWhitelists ${files}
 		java -cp /pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/workflow/bin/NanoporeConverter-Java/ combinedBarcodeWhitelists
 		mv tier1map_barcodes.ser.gz ${sampName}_tier1map_barcodes.ser.gz
 		mv tier2map_barcodes.ser.gz ${sampName}_tier2map_barcodes.ser.gz
 		mv tier3map_barcodes.ser.gz ${sampName}_tier3map_barcodes.ser.gz
 		mv tier4map_barcodes.ser.gz ${sampName}_tier4map_barcodes.ser.gz
 
-#		 java -cp /pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/workflow/bin/modified-UnzipAndConcat-Java/ modified_UnzipAndConcat ".txt" "${sampName}_barcodes"
-#		mv "${sampName}_barcodes" "${sampName}_barcodes.txt"
-#		# this is to get rid of any duplicates
-#		awk -i inplace '!seen[\$0]++' "${sampName}_barcodes.txt"
-#		gzip -k "${sampName}_barcodes.txt"
 	"""
 
 }
@@ -75,8 +69,6 @@ process CAT_STATS {
 		# this is to get rid of any duplicates
 		awk -i inplace '!seen[\$0]++' "${sampName}_stats.txt"
 	"""
-
-
 }
 
 process CONVERT_NANOPORE_RESCUE {
@@ -122,7 +114,7 @@ process CAT_CONVERTED_FASTQS {
 	"""
 		java -cp /pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/workflow/bin/modified-UnzipAndConcat-Java/ modified_UnzipAndConcat ".fastq" "${sampName}_converted_merged_${R}"
 		mv "${sampName}_converted_merged_${R}" "${sampName}_converted_merged_${R}.fastq"
-		gzip -k "${sampName}_converted_merged_${R}.fastq"
+		gzip "${sampName}_converted_merged_${R}.fastq"
 
 	"""
 
