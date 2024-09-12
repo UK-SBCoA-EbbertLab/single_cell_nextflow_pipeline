@@ -67,6 +67,8 @@ public class NanoporeConverter {
 		File[] fastqFiles = new File(".").listFiles((dir, name) -> name.endsWith(".fastq.gz"));
 
 //		File fastqFile = new File(Paths.get(args[0]).toAbsolutePath().toString());
+//
+		List<pBarcode> allBarcodes = new ArrayList<>();
 
 		ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 		List<Future<?>> futures = new ArrayList<>();
@@ -89,8 +91,6 @@ public class NanoporeConverter {
 				String fileBaseName = args[0] + "_" + args[1];
 				String r1Out = fileBaseName + "_standard_R1.fastq.gz";
 				String r2Out = fileBaseName + "_standard_R2.fastq.gz";
-//			System.out.println(r1Out);
-//			System.out.println(r2Out);
 
 				try {
 					File r1 = new File(r1Out);
@@ -110,27 +110,12 @@ public class NanoporeConverter {
 					System.exit(1);
 				}
 
-//			System.out.println(fastqFile);
-
-				// Clear or initialize output files
-//				try {
-//					clearFile(r1Out);
-//				} catch (IOException e) {
-//					System.err.println("An error occurred while clearing the file: " + r1Out);
-//					e.printStackTrace();
-//					System.exit(1);
-//				}
-//
-//				try {
-//					clearFile(r2Out);
-//				} catch (IOException e) {
-//					System.err.println("An error occurred while clearing the file: " + r2Out);
-//					e.printStackTrace();
-//					System.exit(1);
-//				}
-
 				for (File fastqFile : fastqFiles) {
-					convertNanopore(fastqFile, r1Out, r2Out, fileBaseName);
+					List<pBarcode> barcodesFromFile = convertNanopore(fastqFile, r1Out, r2Out, fileBaseName);
+					synchronized (allBarcodes) {
+						// Accumulate barcodes from each file into the master list
+						allBarcodes.addAll(barcodesFromFile);
+					}
 				}
 			} catch (IOException e) {
 				System.err.println("Error processing files: " + fastqFiles.toString() + ". Error: " + e.getMessage());
@@ -161,6 +146,10 @@ public class NanoporeConverter {
 			executor.shutdownNow();
 		}
 
+		// After all files are processed, serialize the full list of barcodes once
+		String barcodeOutputFile = args[0] + "_" + args[1] + "_barcodeWhitelist.ser.gz";
+		pBarcode.serializeList(allBarcodes, barcodeOutputFile);
+
 	}
 
 	/**
@@ -169,7 +158,7 @@ public class NanoporeConverter {
 	 * @param inputFastq - The FASTQ file to convert.
 	 * @throws IOException if an error occurs during file operations.
 	 */
-	public static void convertNanopore(File fastqFile, String r1Out, String r2Out, String fileBaseName)
+	public static List<pBarcode> convertNanopore(File fastqFile, String r1Out, String r2Out, String fileBaseName)
 			throws IOException {
 		/**
 		 * Instantiate the buffers for the reads, barcode whitelist, and skipped reads
@@ -383,8 +372,9 @@ public class NanoporeConverter {
 			appendToFile(r2Out, String.join("\n", r2Buffer) + "\n");
 			appendToFile(fileBaseName + "_skippedReads.fastq.dontuse.gz", String.join("\n", skippedBuffer) + "\n");
 			appendToFile(fileBaseName + "_skippedReads.stats.gz", String.join("\n", skippedStatsBuffer) + "\n");
-			pBarcode.serializeList(barcodeWhitelist, fileBaseName + "_barcodeWhitelist.ser.gz");
 		}
+
+		return barcodeWhitelist;
 	}
 
 	/**

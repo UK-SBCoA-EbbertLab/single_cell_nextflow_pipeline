@@ -214,6 +214,13 @@ public class NanoporeConverter_rescue {
 
 			// Processing each line of the file
 			while ((line = reader.readLine()) != null) {
+				// Check if the line is empty or only contains whitespace
+				if (line.trim().isEmpty()) {
+					System.out.println("empty line??");
+					continue; // Skip further processing for this line
+				}
+
+
 				// idx == 0 is the header line
 				if (idx == 0) {
 					// We want to grab the header to save it for when we write the line to a file so that we can continue to track reads
