@@ -49,7 +49,7 @@ workflow NANOPORE_STEP_0 {
 		// get the files within each directory and keep track of the sample they belong to
 		ch_files = ch_samples
 			.flatMap { sampName, dir ->
-//				println "Processing directory: ${dir} for sample: ${sampName}"
+				println "Processing directory: ${dir} for sample: ${sampName}"
 				dir.listFiles().findAll { file -> 
 					file.name.endsWith('.fastq.gz') && !isGzipFileEmpty(file.toFile())
 				}
@@ -103,18 +103,25 @@ workflow NANOPORE_STEP_0 {
                                 def matcher = pattern.matcher(fileName)
                                 if (matcher.find()) {
                                 	def extractedPart = matcher.group(1)
-					def pattern2 = ~/^([AGCT]{12})\w+$/
-					def matcher2 = pattern2.matcher(extractedPart)
-					if (matcher2.find()) {
-						def first12 = matcher2.group(1)
-	                                        return [sampName, first12, extractedPart, file]
-					}
+	                                return [sampName, extractedPart, file]
 				}
 			}	
 			.groupTuple(by: [0,1])
+			// group barcodes into groups
+			.collate(5).collect { group ->
+				group.groupBy { it[0] }
+				// collapse down all the barcodes into a list and all the files into a list
+				.collect { sampName , values ->
+					def barcodes = values.collect { it[1] }
+					def files = values.collectMany { it[2] }
+					return [sampName, barcodes, files]
+				} 
+				
+			}
+			.flatMap()					
 			.set { sorted_demultiplexed_files }
 
-//			sorted_demultiplexed_files.view()
+			//sorted_demultiplexed_files.view()
 
 		COMBINE_DEMULTIPLEX(sorted_demultiplexed_files)
 }

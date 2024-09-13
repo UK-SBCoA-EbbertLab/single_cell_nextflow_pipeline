@@ -32,12 +32,12 @@ process COMBINE_DEMULTIPLEX {
 	label 'large'
 
 	input:
-		tuple val(sampName), val(first5), val(barcodes), path(concat_files)
+		tuple val(sampName), val(barcodes), path(concat_files)
 	output:
 		tuple val(sampName), path("*_combined.fastq.gz"), emit: combined_demultiplex
 	script:
 	"""
-		for barcode in \$(echo ${barcodes} | tr -d '[],' | tr ' ' '\n'); do
+		for barcode in \$(echo ${barcodes} | tr -d '[],' | tr ' ' '\n' | sort | uniq); do
 			echo ${sampName}
 			echo \${barcode}
 			java -cp /pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/workflow/bin/modified-UnzipAndConcat-Java/ modified_UnzipAndConcat ".fastq" "\${barcode}" "${sampName}_\${barcode}"
