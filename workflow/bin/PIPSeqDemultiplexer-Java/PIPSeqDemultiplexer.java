@@ -15,6 +15,9 @@ public class PIPSeqDemultiplexer {
 		Path path1 = Paths.get(fastqR1);
 		Path path2 = Paths.get(fastqR2);
 
+		System.out.println(path1);
+		System.out.println(path2);
+
 		if (Files.exists(path1) && Files.exists(path2)) {
 			try {
 				// long size1 = Files.size(path1);
@@ -98,7 +101,12 @@ public class PIPSeqDemultiplexer {
 							+ " the input files are complete (i.e., not truncated).");
 				}
 
-				Path outputFile = Paths.get(sampleName + "_" + baseName + "_" + f1Seq.substring(0, 16) + ".fastq.gz");
+				Path outputFile = Paths.get(sampleName + "_" + f1Seq.substring(0, 16) + "/" + sampleName + "_" + baseName + "_" + f1Seq.substring(0, 16) + ".fastq.gz");
+				// Extract the parent directory
+				Path directory = outputFile.getParent();
+
+				// Create the directory if it doesn't exist
+				Files.createDirectories(directory);
 
 				addToBuffer(outputFile, f2Read);
 				readsProcessed++;

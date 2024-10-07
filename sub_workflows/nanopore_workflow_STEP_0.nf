@@ -94,34 +94,34 @@ workflow NANOPORE_STEP_0 {
 		
 		DEMULTIPLEX(PIPSEEKER.out.to_demultiplex)
 
-		DEMULTIPLEX.out.demult_fastq
-			.transpose()
-			.map { sample -> 
-				def (sampName, file) = sample
-				def pattern = ~/\w+_(\w+)\.fastq\.gz$/
-				def fileName = file.toString()
-                                def matcher = pattern.matcher(fileName)
-                                if (matcher.find()) {
-                                	def extractedPart = matcher.group(1)
-	                                return [sampName, extractedPart, file]
-				}
-			}	
-			.groupTuple(by: [0,1])
-			// group barcodes into groups
-			.collate(5).collect { group ->
-				group.groupBy { it[0] }
-				// collapse down all the barcodes into a list and all the files into a list
-				.collect { sampName , values ->
-					def barcodes = values.collect { it[1] }
-					def files = values.collectMany { it[2] }
-					return [sampName, barcodes, files]
-				} 
-				
-			}
-			.flatMap()					
-			.set { sorted_demultiplexed_files }
-
-			//sorted_demultiplexed_files.view()
-
-		COMBINE_DEMULTIPLEX(sorted_demultiplexed_files)
+//		DEMULTIPLEX.out.demult_fastq
+//			.transpose()
+//			.map { sample -> 
+//				def (sampName, file) = sample
+//				def pattern = ~/\w+_(\w+)\.fastq\.gz$/
+//				def fileName = file.toString()
+//                                def matcher = pattern.matcher(fileName)
+//                                if (matcher.find()) {
+//                                	def extractedPart = matcher.group(1)
+//	                                return [sampName, extractedPart, file]
+//				}
+//			}	
+//			.groupTuple(by: [0,1])
+//			// group barcodes into groups
+//			.collate(500).collect { group ->
+//				group.groupBy { it[0] }
+//				// collapse down all the barcodes into a list and all the files into a list
+//				.collect { sampName , values ->
+//					def barcodes = values.collect { it[1] }
+//					def files = values.collectMany { it[2] }
+//					return [sampName, barcodes, files]
+//				} 
+//				
+//			}
+//			.flatMap()					
+//			.set { sorted_demultiplexed_files }
+//
+//			//sorted_demultiplexed_files.view()
+//
+//		COMBINE_DEMULTIPLEX(sorted_demultiplexed_files)
 }

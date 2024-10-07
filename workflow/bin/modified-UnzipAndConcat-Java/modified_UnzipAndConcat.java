@@ -8,7 +8,7 @@ public class modified_UnzipAndConcat {
 		// Check if the TSV file is provided
 		if (args.length < 2 || args.length > 3) {
 			System.out.println("Usage 1: java modified-UnzipAndConcat <file extension> <output filename>");
-			System.out.println("Usage 2: java modified-UnzipAndConcat <file extension> <barcode> <output filename>");
+			System.out.println("Usage 2: java modified-UnzipAndConcat <file extension> <barcode_dir> <output filename>");
 			System.exit(1);
 		}
 
@@ -33,10 +33,11 @@ public class modified_UnzipAndConcat {
 			String fileName = args[2];
 			try {
 				String currentDirectory = directory;
+				String barcode_dir = directory + "/" + barcode;
 				// Extract .gz files
-				extractGzFiles_barcoded(currentDirectory, fileExtension, barcode);
+				extractGzFiles_barcoded(barcode_dir, fileExtension);
 				// Concatenate .fastq files for this sample
-				concatenateFastqFiles_barcoded(currentDirectory, fileExtension, barcode, fileName);
+				concatenateFastqFiles_barcoded(fileExtension, barcode_dir, fileName);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -79,9 +80,9 @@ public class modified_UnzipAndConcat {
 		}
 	}
 	
-	private static void extractGzFiles_barcoded(String directory, String extension, String barcode) throws IOException {
-		Files.walk(Paths.get(directory)).filter(Files::isRegularFile)
-				.filter(path -> path.toString().contains(barcode) && path.toString().endsWith(extension + ".gz"))
+	private static void extractGzFiles_barcoded(String barcode_dir, String extension) throws IOException {
+		Files.walk(Paths.get(barcode_dir)).filter(Files::isRegularFile)
+				.filter(path -> path.toString().endsWith(extension + ".gz"))
 				.forEach(path -> {
 					try {
 						System.out.println(path);
@@ -92,11 +93,11 @@ public class modified_UnzipAndConcat {
 				});
 	}
 
-	private static void concatenateFastqFiles_barcoded(String directory, String extension, String barcode, String fileName) throws IOException {
+	private static void concatenateFastqFiles_barcoded(String extension, String barcode_dir, String fileName) throws IOException {
 		String outputFile = fileName;
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile, true))) {
-			Files.walk(Paths.get(directory)).filter(Files::isRegularFile)
-					.filter(path -> path.toString().contains(barcode) && path.toString().endsWith(extension))
+			Files.walk(Paths.get(barcode_dir)).filter(Files::isRegularFile)
+					.filter(path -> path.toString().endsWith(extension))
 					.sorted(Comparator.comparing(Path::toString))
 					.forEach(path -> {
 						System.out.println(path);

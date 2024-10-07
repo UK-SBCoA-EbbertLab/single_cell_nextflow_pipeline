@@ -27,9 +27,11 @@ log.info """
  MAPQ value for filtering bam file                              : ${params.mapq}
 
  Step: c = concat across flowcells, 0 = pre processing, 
+       0c = pre processing concat demultiplexed files, 
        1 = basecalling, 2 = mapping, 3 = quantification		: ${params.step}
 
  Sample id table						: ${params.sample_id_table}
+ Demultiplexed files to concat					: ${params.demulti_fastqs}
 
  Path to pre-processed bambu RDS files                          : ${params.bambu_rds}
  Path to QC files that go into MultiQC report                   : ${params.multiqc_input}   
@@ -43,6 +45,7 @@ log.info """
 // Import Workflows
 include {MERGE_FLOWCELL} from '../sub_workflows/concat_across_flowcell'
 include {NANOPORE_STEP_0} from '../sub_workflows/nanopore_workflow_STEP_0'
+include {NANOPORE_STEP_0_comb_demulti} from '../sub_workflows/nanopore_workflow_STEP_0_comb_demulti'
 include {NANOPORE_STEP_1} from '../sub_workflows/nanopore_workflow_STEP_1'
 include {NANOPORE_cDNA_STEP_2} from '../sub_workflows/nanopore_cDNA_workflow_STEP_2'
 include {NANOPORE_dRNA_STEP_2} from '../sub_workflows/nanopore_dRNA_workflow_STEP_2'
@@ -76,6 +79,7 @@ bai = Channel.fromPath(params.bai)
 contamination_ref = Channel.fromPath(params.contamination_ref)
 sample_id_table = params.sample_id_table
 
+demulti_fastqs = Channel.fromPath(params.demulti_fastqs, type: 'dir')
 
 if (params.ercc != "None") {
     ercc = Channel.fromPath(params.ercc)
@@ -113,6 +117,10 @@ workflow {
  
     else if (params.step == 0) {
 	NANOPORE_STEP_0(ont_reads_fq_dir, sample_id_table)
+    } 
+    
+    else if (params.step == '0c') {
+	NANOPORE_STEP_0_comb_demulti(demulti_fastqs)
     } 
 
     else if (params.step == 1) {
