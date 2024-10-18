@@ -1,6 +1,7 @@
 process CONVERT_NANOPORE {
 	
-	publishDir "results/${params.out_dir}/pre_processing/paired_end_fastqs", mode: "copy", overwrite: true
+	publishDir "results/${params.out_dir}/pre_processing/paired_end_fastqs", mode: "copy"
+	//publishDir "results/${params.out_dir}/pre_processing/paired_end_fastqs", mode: "copy", overwrite: true
 
 	label 'huge'
 
@@ -31,7 +32,8 @@ process CONVERT_NANOPORE {
 
 process CAT_BARCODE_WHITELIST {
 
-	publishDir "results/${params.out_dir}/pre_processing/concat_barcode_lists", mode: "copy", overwrite: true
+	publishDir "results/${params.out_dir}/pre_processing/concat_barcode_lists", mode: "copy"
+	//publishDir "results/${params.out_dir}/pre_processing/concat_barcode_lists", mode: "copy", overwrite: true
 
 	label 'large'
 
@@ -54,7 +56,8 @@ process CAT_BARCODE_WHITELIST {
 
 process CAT_STATS {
 	
-	publishDir "results/${params.out_dir}/pre_processing/concat_stats", mode: "copy", overwrite: true
+	publishDir "results/${params.out_dir}/pre_processing/concat_stats", mode: "copy"
+	//publishDir "results/${params.out_dir}/pre_processing/concat_stats", mode: "copy", overwrite: true
 
 	label 'large'
 
@@ -73,7 +76,8 @@ process CAT_STATS {
 
 process CONVERT_NANOPORE_RESCUE {
 	
-	publishDir "results/${params.out_dir}/pre_processing/rescued_paired_end_fastqs", mode: "copy", overwrite: true
+	publishDir "results/${params.out_dir}/pre_processing/rescued_paired_end_fastqs", mode: "copy"
+	//publishDir "results/${params.out_dir}/pre_processing/rescued_paired_end_fastqs", mode: "copy", overwrite: true
 
 	label 'huge'
 
@@ -101,7 +105,8 @@ process CONVERT_NANOPORE_RESCUE {
 
 process CAT_CONVERTED_FASTQS {
 	
-	publishDir "results/${params.out_dir}/pre_processing/concat_merged_fastqs", mode: "copy", overwrite: true
+	publishDir "results/${params.out_dir}/pre_processing/concat_merged_fastqs", mode: "copy"
+	//publishDir "results/${params.out_dir}/pre_processing/concat_merged_fastqs", mode: "copy", overwrite: true
 
 	label 'large'
 
@@ -122,7 +127,8 @@ process CAT_CONVERTED_FASTQS {
 
 process PIPSEEKER {
 	
-	publishDir "results/${params.out_dir}/pre_processing/barcoding/${sampName}/${baseName}", mode: "copy", overwrite: true
+	publishDir "results/${params.out_dir}/pre_processing/barcoding/${sampName}/${baseName}", mode: "copy"
+	//publishDir "results/${params.out_dir}/pre_processing/barcoding/${sampName}/${baseName}", mode: "copy", overwrite: true
 
 	label 'huge'
 
@@ -130,8 +136,8 @@ process PIPSEEKER {
 		tuple val(sampName), val(baseName), path(R)
 
 	output:
-		path("./barcodes/barcode_whitelist.txt"),emit: barcode_list
-		path("./barcodes/generated_barcode_read_info_table.csv")
+		path("./barcodes/${sampName}_${baseName}_barcode_whitelist.txt"), emit: barcode_list
+		tuple val(sampName), path("./barcodes/${sampName}_${baseName}_generated_barcode_read_info_table.csv"), emit:barcode_counts
 		tuple val(sampName), val(baseName), path("./barcoded_fastqs/${sampName}_${baseName}_barcoded_1_R1.fastq.gz"), path("./barcoded_fastqs/${sampName}_${baseName}_barcoded_1_R2.fastq.gz"), emit:to_demultiplex
 
 	script:
@@ -139,5 +145,24 @@ process PIPSEEKER {
 		pipseeker barcode --verbosity 2 --skip-version-check --chemistry v4 --fastq . --output-path . 
 		mv ./barcoded_fastqs/barcoded_1_R1.fastq.gz "./barcoded_fastqs/${sampName}_${baseName}_barcoded_1_R1.fastq.gz"
 		mv ./barcoded_fastqs/barcoded_1_R2.fastq.gz "./barcoded_fastqs/${sampName}_${baseName}_barcoded_1_R2.fastq.gz"
+		mv ./barcodes/generated_barcode_read_info_table.csv "./barcodes/${sampName}_${baseName}_generated_barcode_read_info_table.csv"
+		mv ./barcodes/barcode_whitelist.txt "./barcodes/${sampName}_${baseName}_barcode_whitelist.txt"
 	"""
 }	
+
+process COUNT_AND_FILTER_BARCODES {
+	publishDir "results/${params.out_dir}/pre_processing/barcoding/${sampName}", mode: "copy"
+
+	label 'small'
+
+	input:
+		tuple val(sampName), path(barcode_counts)
+
+	output:
+		tuple val(sampName), path("${sampName}_barcodes_to_keep.txt"), emit:barcodes_to_keep
+
+	script:
+	"""
+		count_barcodes.py --output "${sampName}_barcodes_to_keep.txt" 
+	"""
+}

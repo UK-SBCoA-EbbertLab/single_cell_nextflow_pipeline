@@ -1,5 +1,5 @@
 include {SEP_DIR_BY_SAMP } from '../modules/merge.nf'
-include {CONVERT_NANOPORE ; CONVERT_NANOPORE_RESCUE ; CAT_BARCODE_WHITELIST ; CAT_STATS ; PIPSEEKER } from '../modules/get_barcodes.nf'
+include {CONVERT_NANOPORE ; CONVERT_NANOPORE_RESCUE ; CAT_BARCODE_WHITELIST ; CAT_STATS ; PIPSEEKER ; COUNT_AND_FILTER_BARCODES } from '../modules/get_barcodes.nf'
 include {DEMULTIPLEX ; COMBINE_DEMULTIPLEX} from '../modules/demultiplex_pipseq.nf'
 
 import java.util.zip.GZIPInputStream
@@ -91,8 +91,11 @@ workflow NANOPORE_STEP_0 {
 			CONVERT_NANOPORE.out.good
 				.concat(CONVERT_NANOPORE_RESCUE.out.good)
 		)	
-		
-		DEMULTIPLEX(PIPSEEKER.out.to_demultiplex)
+
+
+		COUNT_AND_FILTER_BARCODES(PIPSEEKER.out.barcode_counts.groupTuple())
+
+		DEMULTIPLEX(PIPSEEKER.out.to_demultiplex.combine(COUNT_AND_FILTER_BARCODES.out.barcodes_to_keep, by: 0))
 
 //		DEMULTIPLEX.out.demult_fastq
 //			.transpose()

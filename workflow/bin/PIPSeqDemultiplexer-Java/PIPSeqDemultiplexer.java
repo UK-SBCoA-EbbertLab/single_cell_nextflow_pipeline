@@ -10,23 +10,28 @@ public class PIPSeqDemultiplexer {
 	private static final Map<Path, Integer> fileBufferCurrentReadCount = new HashMap<>();
 	private static final Map<Path, Integer> fileBufferPrintedReadCount = new HashMap<>();
 
-	public static void demultiplexPips(String fastqR1, String fastqR2, String sampleName, String baseName) {
+	public static void demultiplexPips(String fastqR1, String fastqR2, String barToKeep, String sampleName, String baseName) {
 
 		Path path1 = Paths.get(fastqR1);
 		Path path2 = Paths.get(fastqR2);
+		Path barcodes = Paths.get(barToKeep);
 
 		System.out.println(path1);
 		System.out.println(path2);
+		System.out.println(barcodes);
 
-		if (Files.exists(path1) && Files.exists(path2)) {
+		if (Files.exists(path1) && Files.exists(path2) && Files.exists(barcodes)) {
 			try {
 				// long size1 = Files.size(path1);
 				// long size2 = Files.size(path2);
 
 				// System.out.println("Size of " + fastqR1 + ": " + size1 + " bytes");
 				// System.out.println("Size of " + fastqR2 + ": " + size2 + " bytes");
+				
 
-				processFiles(fastqR1, fastqR2, sampleName, baseName);
+				Set<String> barcodesToKeep = readBarcodes(barToKeep);
+
+				processFiles(fastqR1, fastqR2, barcodesToKeep, sampleName, baseName);
 			} catch (IOException e) {
 				System.out.println("I/O Exception occurred");
 				e.printStackTrace();
@@ -50,7 +55,28 @@ public class PIPSeqDemultiplexer {
 		flushAllBuffers();
 	}
 
-	public static void processFiles(String fastqR1, String fastqR2, String sampleName, String baseName)
+	public static Set<String> readBarcodes(String inputFilePath) {
+		Set<String> barcodes = new HashSet<>();
+
+		try (BufferedReader br = new BufferedReader(new FileReader(inputFilePath))) {
+			String line;
+			// Skip the header row
+			br.readLine();
+
+			while ((line = br.readLine()) != null) {
+				String[] columns = line.split("\t");
+				String barcode = columns[0];  // First column is the barcode
+				barcodes.add(barcode);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return barcodes;
+	}
+
+
+	public static void processFiles(String fastqR1, String fastqR2, Set<String> barcodesToKeep, String sampleName, String baseName)
 			throws IOException {
 
 		String f1ReadName, f1Seq, f2ReadName;
@@ -101,14 +127,16 @@ public class PIPSeqDemultiplexer {
 							+ " the input files are complete (i.e., not truncated).");
 				}
 
-				Path outputFile = Paths.get(sampleName + "_" + f1Seq.substring(0, 16) + "/" + sampleName + "_" + baseName + "_" + f1Seq.substring(0, 16) + ".fastq.gz");
-				// Extract the parent directory
-				Path directory = outputFile.getParent();
-
-				// Create the directory if it doesn't exist
-				Files.createDirectories(directory);
-
-				addToBuffer(outputFile, f2Read);
+				if (barcodesToKeep.contains(f1Seq.substring(0, 16))) {
+					Path outputFile = Paths.get(sampleName + "_" + f1Seq.substring(0, 16) + "/" + sampleName + "_" + baseName + "_" + f1Seq.substring(0, 16) + ".fastq.gz");
+					// Extract the parent directory
+					Path directory = outputFile.getParent();
+	
+					// Create the directory if it doesn't exist
+					Files.createDirectories(directory);
+	
+					addToBuffer(outputFile, f2Read);
+				}
 				readsProcessed++;
 
 			}
@@ -301,8 +329,8 @@ public class PIPSeqDemultiplexer {
 
 	public static void main(String[] args) {
 
-		if (args.length != 4) {
-			System.out.println("Usage: FastqFilter <fastqR1> <fastqR2> <sampleName> <baseName>");
+		if (args.length != 5) {
+			System.out.println("Usage: FastqFilter <fastqR1> <fastqR2> <barcodesToKeep> <sampleName> <baseName>");
 			return;
 		}
 
@@ -310,10 +338,11 @@ public class PIPSeqDemultiplexer {
 		String fastqR2 = Paths.get(args[1]).toAbsolutePath().toString();
 		System.out.println(fastqR1);
 		System.out.println(fastqR2);
-		String sampleName = args[2];
-		String baseName = args[3];
+		String barToKeep = Paths.get(args[2]).toAbsolutePath().toString();
+		String sampleName = args[3];
+		String baseName = args[4];
 
-		demultiplexPips(fastqR1, fastqR2, sampleName, baseName);
+		demultiplexPips(fastqR1, fastqR2, barToKeep, sampleName, baseName);
 	}
 
 }

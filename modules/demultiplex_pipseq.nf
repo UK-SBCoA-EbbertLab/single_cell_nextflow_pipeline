@@ -1,11 +1,11 @@
 process DEMULTIPLEX {
 	
-        publishDir "results/${params.out_dir}/pre_processing/demultiplexed/${sampName}/", mode: "copy", overwrite: true
+        publishDir "results/${params.out_dir}/pre_processing/demultiplexed/${sampName}/", mode: "copy"
 
 	label 'barcoding'
 
 	input:
-		tuple val(sampName), val(baseName), path(barcoded_fastq_R1), path(barcoded_fastq_R2)
+		tuple val(sampName), val(baseName), path(barcoded_fastq_R1), path(barcoded_fastq_R2), path(barcodes_to_keep)
 	output:
 		tuple val(sampName), path("**/*.fastq.gz"), emit: demult_fastq
 		path("*.txt")
@@ -20,6 +20,7 @@ process DEMULTIPLEX {
 	   	PIPSeqDemultiplexer \
 	   	${barcoded_fastq_R1} \
 	   	${barcoded_fastq_R2} \
+		${barcodes_to_keep} \
 	   	${sampName} \
 		${baseName} 
 	"""
