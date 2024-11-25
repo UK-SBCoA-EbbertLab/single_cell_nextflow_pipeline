@@ -3,10 +3,11 @@ process CONVERT_NANOPORE {
 	publishDir "results/${params.out_dir}/pre_processing/paired_end_fastqs", mode: "copy"
 	//publishDir "results/${params.out_dir}/pre_processing/paired_end_fastqs", mode: "copy", overwrite: true
 
-	label 'huge'
+	label 'convert_nanopore'
+	//label 'huge'
 
 	input:
-		tuple val (sampName), val (baseName), path (input_fastqs)
+		tuple val(sampName), val(baseName), path (input_fastqs)
 
 
 	output:
@@ -18,11 +19,16 @@ process CONVERT_NANOPORE {
 	script:
 //	sampName = input_fastq.name.replaceAll(/\..*$/, "")
 	"""
-		echo "${sampName}"
-		echo "${baseName}"
+
+		# Loop through each line in the input file
+		while IFS= read -r file_path; do
+		    # Create a symbolic link in the current directory with the base name
+		    ln -s "\$file_path" .
+		done < "${input_fastqs}"
+		
 		java \
-		    -Xms300g \
-		    -Xmx400g \
+		    -Xms10g \
+		    -Xmx45g \
 		    -cp /pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/workflow/bin/NanoporeConverter-Java/ \
 		    NanoporeConverter \
 		    ${sampName} \
@@ -35,7 +41,8 @@ process CAT_BARCODE_WHITELIST {
 	publishDir "results/${params.out_dir}/pre_processing/concat_barcode_lists", mode: "copy"
 	//publishDir "results/${params.out_dir}/pre_processing/concat_barcode_lists", mode: "copy", overwrite: true
 
-	label 'large'
+	label 'cat_barcode_whitelist'
+	//label 'large'
 
 	input:
 		tuple val(sampName), path(files)
@@ -59,7 +66,8 @@ process CAT_STATS {
 	publishDir "results/${params.out_dir}/pre_processing/concat_stats", mode: "copy"
 	//publishDir "results/${params.out_dir}/pre_processing/concat_stats", mode: "copy", overwrite: true
 
-	label 'large'
+	label 'cat_stats'
+	//label 'large'
 
 	input:
 		tuple val(sampName), path(files)
@@ -79,7 +87,8 @@ process CONVERT_NANOPORE_RESCUE {
 	publishDir "results/${params.out_dir}/pre_processing/rescued_paired_end_fastqs", mode: "copy"
 	//publishDir "results/${params.out_dir}/pre_processing/rescued_paired_end_fastqs", mode: "copy", overwrite: true
 
-	label 'huge'
+	label 'convert_nanopore_rescue'
+	//label 'huge'
 
 	input:
 		tuple val(sampName), val(baseName), path(fastq_to_rescue), path(barcodes_1), path(barcodes_2), path(barcodes_3), path(barcodes_4)
@@ -95,8 +104,8 @@ process CONVERT_NANOPORE_RESCUE {
 		echo "${sampName}"
 		echo "${fastq_to_rescue}"
 		java \
-		    -Xms300g \
-		    -Xmx400g \
+		    -Xms100g \
+		    -Xmx225g \
 		    -cp /pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/workflow/bin/NanoporeConverter-Java/ \
 		    NanoporeConverter_rescue \
 		    ${fastq_to_rescue} ${barcodes_1} ${barcodes_2} ${barcodes_3} ${barcodes_4}
@@ -130,7 +139,8 @@ process PIPSEEKER {
 	publishDir "results/${params.out_dir}/pre_processing/barcoding/${sampName}/${baseName}", mode: "copy"
 	//publishDir "results/${params.out_dir}/pre_processing/barcoding/${sampName}/${baseName}", mode: "copy", overwrite: true
 
-	label 'huge'
+	label 'pipseeker'
+	//label 'huge'
 
 	input:
 		tuple val(sampName), val(baseName), path(R)
@@ -138,7 +148,7 @@ process PIPSEEKER {
 	output:
 		path("./barcodes/${sampName}_${baseName}_barcode_whitelist.txt"), emit: barcode_list
 		tuple val(sampName), path("./barcodes/${sampName}_${baseName}_generated_barcode_read_info_table.csv"), emit:barcode_counts
-		tuple val(sampName), val(baseName), path("./barcoded_fastqs/${sampName}_${baseName}_barcoded_1_R1.fastq.gz"), path("./barcoded_fastqs/${sampName}_${baseName}_barcoded_1_R2.fastq.gz"), emit:to_demultiplex
+		tuple val(sampName), path("./barcoded_fastqs/${sampName}_${baseName}_barcoded_1_R1.fastq.gz"), path("./barcoded_fastqs/${sampName}_${baseName}_barcoded_1_R2.fastq.gz"), emit:to_demultiplex
 
 	script:
 	"""
@@ -153,16 +163,18 @@ process PIPSEEKER {
 process COUNT_AND_FILTER_BARCODES {
 	publishDir "results/${params.out_dir}/pre_processing/barcoding/${sampName}", mode: "copy"
 
-	label 'small'
+	label 'count_and_filter_barcodes'
+	//label 'small'
 
 	input:
 		tuple val(sampName), path(barcode_counts)
 
 	output:
 		tuple val(sampName), path("${sampName}_barcodes_to_keep.txt"), emit:barcodes_to_keep
+		path("${sampName}_all_barcodes.txt")
 
 	script:
 	"""
-		count_barcodes.py --output "${sampName}_barcodes_to_keep.txt" 
+		count_barcodes.py --threshold ${params.barcode_thresh} --output "${sampName}_barcodes_to_keep.txt" --fulloutput "${sampName}_all_barcodes.txt"
 	"""
 }

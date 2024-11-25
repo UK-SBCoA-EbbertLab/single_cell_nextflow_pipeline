@@ -17,6 +17,9 @@ public class UnzipAndConcat {
 		String tsvFilename = args[0];
 		String directory = args[1];
 
+		System.out.println(tsvFilename);
+		System.out.println(directory);
+
 		// Parse TSV to get sample to folder mapping
 		Map<String, String> sampleToFolderMap = parseTsv(tsvFilename);
 		sampleToFolderMap

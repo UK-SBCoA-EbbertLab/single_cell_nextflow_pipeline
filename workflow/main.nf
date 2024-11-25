@@ -31,6 +31,7 @@ log.info """
        1 = basecalling, 2 = mapping, 3 = quantification		: ${params.step}
 
  Sample id table						: ${params.sample_id_table}
+ Threshold of reads per barcode					: ${params.barcode_thresh}
  Demultiplexed files to concat					: ${params.demulti_fastqs}
 
  Path to pre-processed bambu RDS files                          : ${params.bambu_rds}

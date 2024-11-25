@@ -4,7 +4,7 @@ import csv
 import argparse
 from collections import defaultdict
 
-def sum_barcodes_in_directory(input_dir, output_tsv):
+def sum_barcodes_in_directory(input_dir, threshold, output_tsv, full_output):
     barcode_counts = defaultdict(int)
 
     # Loop through all files in the input directory
@@ -23,8 +23,15 @@ def sum_barcodes_in_directory(input_dir, output_tsv):
                     # Sum reads by barcode
                     barcode_counts[barcode] += num_reads
 
-    # Filter barcodes with reads > 1000
-    filtered_barcodes = {barcode: reads for barcode, reads in barcode_counts.items() if reads > 50}
+    with open(full_output, 'w') as fullTsv:
+        tsv_writer = csv.writer(fullTsv, delimiter='\t')
+        tsv_writer.writerow(['BARCODE', 'TOTAL_READS']) #header row
+
+        for barcode, total_reads in barcode_counts.items():
+            tsv_writer.writerow([barcode, total_reads])
+
+    # Filter barcodes with reads > threshold
+    filtered_barcodes = {barcode: reads for barcode, reads in barcode_counts.items() if reads > threshold}
 
     # Write the filtered result to a TSV file
     with open(output_tsv, 'w') as tsvfile:
@@ -42,13 +49,21 @@ if __name__ == "__main__":
 
     # Output file is still required
     parser.add_argument('--output', '-o', required=True, help="Output TSV file path")
+    parser.add_argument('--fulloutput', '-f', required=True, help="Output TSV file path - full barcodes")
+    parser.add_argument('--threshold', '-t', required=True, help="Threshold (n reads) for filtering barcodes")
 
     args = parser.parse_args()
 
     # Use the provided input directory or default to current directory
     input_directory = args.input
     output_file = args.output
+    full_output = args.fulloutput
+    try:
+        threshold = int(args.threshold)
+    except ValueError:
+        print("Error: Threshold value must be an integer.")
+        sys.exit(1)  # Exits the program with a non-zero status to indicate an error
 
     # Call the function
-    sum_barcodes_in_directory(input_directory, output_file)
+    sum_barcodes_in_directory(input_directory, threshold, output_file, full_output)
 

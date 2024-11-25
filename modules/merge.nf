@@ -15,8 +15,22 @@ process MERGE_MATRICES {
 }
 
 process SEP_DIR_BY_SAMP {
-	label 'small'
-	
+	label 'local'
+
+	input:
+		path sample_id_table
+	output:
+		path("*.txt"), emit: dir_by_samp
+	script:
+	"""
+		awk '{ print \$1 > \$2 "_samp_to_dir.txt" }' ${sample_id_table}
+	"""
+
+}
+
+process SEP_DIR_BY_SAMP_KEEP_SAMP {
+	label 'local'
+
 	input:
 		path sample_id_table
 	output:
@@ -26,6 +40,44 @@ process SEP_DIR_BY_SAMP {
 		awk '{ print > \$2 "_samp_to_dir.txt" }' ${sample_id_table}
 	"""
 
+}
+
+process GET_ALL_FASTQ_GZ {
+
+	publishDir "results/${params.out_dir}/pre_processing/sample_files_chunked", mode: "copy"
+
+	label 'local'
+
+	input:
+		path sample_id_table
+		val base_path
+	output:
+		path("*_samp_to_dir.txt"), emit: all_files
+		path("*_samp_to_dir_chunk_*"), emit: split_files
+
+	script:
+	"""
+		# Process each line of the input file
+		while IFS=\$'\\t' read -r dir sample_id; do
+		    # Combine base path with the directory path
+		    full_dir_path="${base_path}/\${dir}"
+		
+		    # Use find to get all .fastq.gz files in the directory
+		    find "\${full_dir_path}" -name "*.fastq.gz" | while read -r file_path; do
+		        # Check if the file is not empty
+		        if [ -s "\${file_path}" ]; then
+		            echo -e "\${file_path}\t\${sample_id}" >> all_sample_files_to_samp_id.txt
+		        fi
+		    done
+		done < "${sample_id_table}"
+		
+		awk '{ print \$1 > \$2 "_samp_to_dir.txt" }' all_sample_files_to_samp_id.txt
+
+		for file in *_samp_to_dir.txt; do
+			split -l 500 -d "\${file}" "\${file%.*}_chunk_"
+		done
+
+	"""
 }
 
 process MERGE_SUMMARY {
@@ -43,6 +95,7 @@ process MERGE_SUMMARY {
 		concat_summary.sh ${dir_by_samp} ${ont_fq_to_merge}
 	"""
 }
+
 process MERGE_FASTQ {
 	label 'large'
 

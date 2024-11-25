@@ -6,5 +6,5 @@ workflow NANOPORE_STEP_0_comb_demulti {
 
         main:
 
-		COMBINE_DEMULTIPLEX(demulti_fastqs.collate(500))
+		COMBINE_DEMULTIPLEX(demulti_fastqs.collate(5000))
 }

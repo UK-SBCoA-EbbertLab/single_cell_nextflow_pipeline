@@ -7,7 +7,7 @@
 #SBATCH --partition=normal
 #SBATCH -e slurm-%j.err
 #SBATCH -o slurm-%j.out
-#SBATCH -A cca_mteb223_uksr
+#SBATCH -A coa_mteb223_uksr
 
 nextflow ../../workflow/main.nf \
 	--demulti_fastqs "results/maddy_testing_sc_st0/pre_processing/demultiplexed/*/*" \

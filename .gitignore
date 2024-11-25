@@ -7,3 +7,8 @@ references/
 **/.nextflow.log*
 **/slurm*
 **/.nextflow/
+**/trace*
+**/report*
+**/timeline*
+**/dag*
+testing_eff/

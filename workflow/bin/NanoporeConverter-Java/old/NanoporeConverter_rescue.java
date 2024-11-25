@@ -59,19 +59,14 @@ public class NanoporeConverter_rescue {
 
 	public static void main(String[] args) {
 		// Check if correct number of arguments provided
-		if (args.length != 5) {
-			System.err.println("Usage: NanoporeConverter_rescue <inputFastq> <tier1Map> <tier2Map> <tier3Map> <tier4Map>");
+		if (args.length != 2) {
+			System.err.println("Usage: NanoporeConverter_rescue <inputFastq> <barcodes>");
 			System.exit(1);
 		}
 
 		File fastqFile = new File(Paths.get(args[0]).toAbsolutePath().toString());
-		
-		//Instantiate whitelist barcodes
-		final HashMap<String, Set<pBarcode>> tier1map = pBarcode.loadMapFromFile(args[1]);
-		final HashMap<String, Set<pBarcode>> tier2map = pBarcode.loadMapFromFile(args[2]);
-		final HashMap<String, Set<pBarcode>> tier3map = pBarcode.loadMapFromFile(args[3]);
-		final HashMap<String, Set<pBarcode>> tier4map = pBarcode.loadMapFromFile(args[4]);
-		
+		//Instantiate list of whitelist barcodes
+		Set<String> barcodeSet = getBarcodeWhitelist(Paths.get(args[1]).toAbsolutePath().toString());
 
 		ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 		List<Future<?>> futures = new ArrayList<>();
@@ -136,7 +131,7 @@ public class NanoporeConverter_rescue {
 					System.exit(1);
 				}
 
-				convertNanopore(fastqFile, r1Out, r2Out, baseFileName, tier1map, tier2map, tier3map, tier4map);
+				convertNanopore(fastqFile, barcodeSet, r1Out, r2Out, baseFileName);
 			} catch (IOException e) {
 				System.err.println("Error processing file: " + fastqFile.getName() + ". Error: " + e.getMessage());
 				e.printStackTrace();
@@ -152,7 +147,6 @@ public class NanoporeConverter_rescue {
 				future1.get();
 			} catch (InterruptedException | ExecutionException e) {
 				System.err.println("Error in processing: " + e.getMessage());
-				e.printStackTrace();
 				System.exit(1);
 			}
 		}
@@ -169,16 +163,33 @@ public class NanoporeConverter_rescue {
 
 	}
 
+	// Get the barcode whitelist and set it to a set so that we can compare the barcodes later
+	private static Set<String> getBarcodeWhitelist(String barcodeFile) {
+		Set<String> lines = new HashSet<>();
+
+		try (GZIPInputStream gzipInputStream = new GZIPInputStream(new FileInputStream(barcodeFile));
+				BufferedReader reader = new BufferedReader(new InputStreamReader(gzipInputStream))) {
+
+			String line;
+			while ((line = reader.readLine()) != null) {
+				lines.add(line);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+
+		return lines;
+	}
+
 	/**
 	 * Converts Nanopore FASTQ files to standard paired-end Illumina format.
 	 * 
 	 * @param inputFastq - The FASTQ file to convert.
 	 * @throws IOException if an error occurs during file operations.
 	 */
-	public static void convertNanopore(File fastqFile, String r1Out, String r2Out,
-			String fileBaseName, HashMap<String, Set<pBarcode>> tier1map,
-			HashMap<String, Set<pBarcode>> tier2map, HashMap<String, Set<pBarcode>> tier3map,
-			HashMap<String, Set<pBarcode>> tier4map) throws IOException {
+	public static void convertNanopore(File fastqFile, Set<String> barcodes, String r1Out, String r2Out,
+			String fileBaseName) throws IOException {
 		/**
 		 * Instantiate the buffers for the reads, barcode whitelist, and skipped reads
 		 */
@@ -214,13 +225,6 @@ public class NanoporeConverter_rescue {
 
 			// Processing each line of the file
 			while ((line = reader.readLine()) != null) {
-				// Check if the line is empty or only contains whitespace
-				if (line.trim().isEmpty()) {
-					System.out.println("empty line??");
-					continue; // Skip further processing for this line
-				}
-
-
 				// idx == 0 is the header line
 				if (idx == 0) {
 					// We want to grab the header to save it for when we write the line to a file so that we can continue to track reads
@@ -279,7 +283,7 @@ public class NanoporeConverter_rescue {
 					// if we did find a barcode
 					if (found) {
 						// if the barcode isn't ambiguous (see pBarcode for meaning)
-						if (!barcode.isAmbiguous()) {
+						if (!barcode.isAmbiguous) {
 							System.out.println("WHY IS IT NOT AMBIGUOUS NOW???");
 							System.out.println("I THINK THIS MIGHT BE DUE TO A LENGTH ISSUE");
 							System.out.println(line);
@@ -287,37 +291,35 @@ public class NanoporeConverter_rescue {
 							skipRead = true;
 						} else {
 							// If the barcode is ambiguous, we want to try to rescue the barcode
-							barcode.rescueBarcode(tier1map, tier2map, tier3map, tier4map);
+							barcode.rescueBarcode(barcodes);
 							System.out.println(barcode.pBarcode);
-							
-							if(!barcode.isAmbiguous()) {
-								r2StartPos = r1EndPos + 31;
-								System.out.println("r1StartPos: " + r1StartPos + "\nr1EndPos: " + r1EndPos
-										+ "\nr2StartPos: " + r2StartPos + "\nline length: " + line.length());
 
-								// we want to make sure that we aren't trying to grab more if it isn't there
-								if (line.length() > r2StartPos + 20) {
-									// set r1 to the barcode plus the molecular index sequence
-									r1Sequence = barcode.pBarcode + line.substring(r1EndPos, r1EndPos + 15);
+							r2StartPos = r1EndPos + 31;
+							System.out.println("r1StartPos: " + r1StartPos + "\nr1EndPos: " + r1EndPos
+									+ "\nr2StartPos: " + r2StartPos + "\nline length: " + line.length());
 
-									// if the length of the barcode and the MI sequence is less than 54, error because PIPSEEK needs it to be 54
-									if (r1Sequence.length() < 54) {
-										System.out.println(" LENGTH OF THE SEQUENCE: " + r1Sequence.length());
-										System.out.println(barcode.toString());
-										throw new Exception("ERROR: " + ogHeaderInfo + " barcode was not long enough. OG: "
-												+ line.substring(r1StartPos - 3, r1EndPos + 12) + " P: " + r1Sequence);
-									}
+							// we want to make sure that we aren't trying to grab more if it isn't there
+							if (line.length() > r2StartPos + 20) {
+								// set r1 to the barcode plus the molecular index sequence
+								r1Sequence = barcode.pBarcode + line.substring(r1EndPos, r1EndPos + 15);
 
-									// get the r2 sequence
-									r2Sequence = line.substring(r2StartPos).strip();
-								} else {
-									n_skipped_reads += 1;
-									skipRead = true;
+								// if the length of the barcode and the MI sequence is less than 54, error because PIPSEEK needs it to be 54
+								if (r1Sequence.length() < 54) {
+									System.out.println(" LENGTH OF THE SEQUENCE: " + r1Sequence.length());
+									System.out.println("ogTier 1: " + barcode.ogTier1 + "\nogTier 2: " + barcode.ogTier2
+											+ "\nogTier 3: " + barcode.ogTier3 + "\nogTier 4: " + barcode.ogTier4);
+									System.out.println("Tier 1: " + barcode.tier1 + "\nTier 2: " + barcode.tier2
+											+ "\nTier 3: " + barcode.tier3 + "\nTier 4: " + barcode.tier4);
+									System.out.println(
+											"l1: " + barcode.ogL1 + "\nl2: " + barcode.ogL2 + "\nl3: " + barcode.ogL3);
+									throw new Exception("ERROR: " + ogHeaderInfo + " barcode was not long enough. OG: "
+											+ line.substring(r1StartPos - 3, r1EndPos + 12) + " P: " + r1Sequence);
 								}
-								
+
+								// get the r2 sequence
+								r2Sequence = line.substring(r2StartPos).strip();
 							} else {
 								n_skipped_reads += 1;
-								n_ambiguous_barcode += 1;
 								skipRead = true;
 							}
 						}
@@ -378,10 +380,6 @@ public class NanoporeConverter_rescue {
 					idx = -1;
 				}
 				idx = (idx + 1) % 4;
-				if (!skippedBuffer.isEmpty() && n_skipped_reads % 5000 == 0) {
-					appendToFile(fileBaseName + "_skippedReads.fastq.dontuse.gz", String.join("\n", skippedBuffer) + "\n");
-					skippedBuffer.clear();
-				}
 			}
 
 			// after we are done going through all the reads, we want to add the skipped stats to their buffer
@@ -391,11 +389,9 @@ public class NanoporeConverter_rescue {
 			System.out.println(skippedStatsBuffer);
 		} catch (IOException e) {
 			System.err.println("Error processing file: " + fastqFile.getName() + ". Error: " + e.getMessage());
-			e.printStackTrace();
 			System.exit(1);
 		} catch (Exception e) {
 			System.err.println("Error processing file: " + fastqFile.getName() + ". Error: " + e.getMessage());
-			e.printStackTrace();
 			System.exit(1);
 		}
 

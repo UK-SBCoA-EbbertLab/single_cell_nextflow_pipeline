@@ -10,7 +10,9 @@
 #SBATCH -A coa_mteb223_uksr
 
 time nextflow ../../../workflow/main.nf \
-	--out_dir "PBMC_patient0_OCT_2024" \
+	-with-trace \
+	-with-timeline \
+	--out_dir "PBMC_patient0_NOV_2024" \
 	--ont_fq_to_merge "/pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/datasets/PBMC/PBMC_patient0/" \
         --sample_id_table "/pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/datasets/PBMC/PBMC_patient0/sample_id_to_folder.tsv" \
         --step c #\
