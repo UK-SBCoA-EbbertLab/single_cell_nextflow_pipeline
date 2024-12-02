@@ -11,13 +11,12 @@ process CONVERT_NANOPORE {
 
 
 	output:
-		tuple val(sampName), val(baseName), path("*.fastq.gz"), emit: good
+		tuple val(sampName), val(baseName), path("${sampName}*.fastq.gz"), emit: good
 		tuple val(sampName), path("*.stats.gz"),  emit: bad_stats
 		tuple val(sampName), val(baseName), path("*dontuse.gz"),  emit: to_rescue
 		tuple val(sampName), path("*.ser.gz"),  emit: barcodes
 
 	script:
-//	sampName = input_fastq.name.replaceAll(/\..*$/, "")
 	"""
 
 		# Loop through each line in the input file
@@ -72,13 +71,15 @@ process CAT_STATS {
 	input:
 		tuple val(sampName), path(files)
 	output:
-		tuple val(sampName), path("*_stats.txt")
+		tuple val(sampName), path("*_stats_sorted.txt")
 	
 	script:
 	"""
 		java -cp /pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/workflow/bin/modified-UnzipAndConcat-Java/ modified_UnzipAndConcat ".stats" "${sampName}_stats.txt"
 		# this is to get rid of any duplicates
 		awk -i inplace '!seen[\$0]++' "${sampName}_stats.txt"
+		{ head -n 1 "${sampName}_stats.txt"; tail -n +2 "${sampName}_stats.txt" | sort; } > "${sampName}_stats_sorted.txt"
+		rm "${sampName}_stats.txt"
 	"""
 }
 

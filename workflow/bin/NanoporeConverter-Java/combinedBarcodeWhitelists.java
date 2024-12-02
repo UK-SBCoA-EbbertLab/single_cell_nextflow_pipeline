@@ -31,6 +31,7 @@ public class combinedBarcodeWhitelists {
 					addBarcodesToMaps(deserializedPBarcodes);
 		    		} else {
 					System.err.println("Failed to deserialize file: " + filePath);
+					System.exit(1);
 				}	
 			}
 

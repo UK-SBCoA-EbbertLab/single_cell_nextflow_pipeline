@@ -11,10 +11,11 @@
 
 nextflow ../../workflow/main.nf \
 	-with-report \
+	-with_trace \
         --sample_id_table "/pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/datasets/test_data/maddy_currated_test/sample_id_to_folder.tsv" \
 	--ont_reads_fq_dir "/pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/datasets/test_data/maddy_currated_test/" \
-        --out_dir "maddy_testing_sc_st0_chunk" \
-        --demultiplex_name "maddy_testing_sc_st0_chunk" \
-        --step 0 \
-	-resume #\
+        --out_dir "maddy_testing_sc_st0_new_demultiplex" \
+        --demultiplex_name "maddy_testing_sc_st0_new_demultiplex" \
+        --step 0 #\
+#	-resume #\
 	#--ont_reads_fq_dir "/pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/datasets/test_data/TCell_test/" \

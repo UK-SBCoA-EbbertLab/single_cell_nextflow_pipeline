@@ -17,15 +17,48 @@ process DEMULTIPLEX {
 		echo ${barcoded_fastq_R2}
 		java \
     		-Xms100g \
-	   	-Xmx140g \
+	   	-Xmx240g \
 	   	-cp /pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/workflow/bin/PIPSeqDemultiplexer-Java/ \
 	   	PIPSeqDemultiplexer \
 		${barcodes_to_keep} \
 	   	${sampName} \
 		"." \
-		${params.barcode_thresh} 
+		${params.n_threads}
 
-#		find ${sampName}_*.fastq -type f -exec awk -v lines=\$((${params.barcode_thresh} * 4)) 'NR>lines{f=1; exit} END{exit f}' {} \\; -exec rm {} \\;
+
+		# filter the files by barcode count again
+		while read -r line; do
+			# skip the header row
+			if [[ "\$line" == "Barcode"* ]]; then
+				echo "\$line" >> "${sampName}_passing_barcodes.txt"
+				continue
+			fi
+
+			# Parse the barcode and read count from the line
+			barcode=\$(echo "\$line" | awk '{print \$1}')
+			reads=\$(echo "\$line" | awk '{print \$2}')
+
+			# Check if the read count meets the threshold
+			if (( reads >= ${params.barcode_thresh} )); then
+				# If the file exists, retain it and add the barcode to the output file
+				if [[ -f "\$barcode" ]]; then
+					echo "\$line" >> "${sampName}_passing_barcodes.txt"
+				fi
+			else
+				# If the file exists, delete it
+				if [[ -f "\$barcode" ]]; then
+					echo "Removing file: \$barcode"
+					rm "\$barcode"
+				fi
+			fi
+		done < "${sampName}_barcode_counts.txt"
+
+		echo "Processing complete. Passing barcodes saved to ${sampName}_passing_barcodes.txt. Now sorting ..."
+
+		sort -n -k 2 ${sampName}_passing_barcodes.txt > ${sampName}_passing_barcodes_sorted.txt
+
+		echo "Barcodes sorted and saved to ${sampName}_passing_barcodes_sorted.txt."
+		
 	"""
 }
 

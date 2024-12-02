@@ -1,4 +1,4 @@
-include {SEP_DIR_BY_SAMP ; GET_ALL_FASTQ_GZ } from '../modules/merge.nf'
+include { GET_ALL_FASTQ_GZ } from '../modules/merge.nf'
 include {CONVERT_NANOPORE ; CONVERT_NANOPORE_RESCUE ; CAT_BARCODE_WHITELIST ; CAT_STATS ; PIPSEEKER ; COUNT_AND_FILTER_BARCODES } from '../modules/get_barcodes.nf'
 include {DEMULTIPLEX ; COMBINE_DEMULTIPLEX} from '../modules/demultiplex_pipseq.nf'
 
@@ -33,44 +33,6 @@ workflow NANOPORE_STEP_0 {
         main:
 
 		GET_ALL_FASTQ_GZ(sample_id_table, ont_reads_fq_dir)
-//		SEP_DIR_BY_SAMP(GET_ALL_FASTQ_GZ.out.all_files)
-
-//		// create a channel with directories for each sample
-//		ch_samples = SEP_DIR_BY_SAMP.out.dir_by_samp.flatten()
-//			.flatMap { sampleFile -> 
-//				def sampleName = sampleFile.baseName.replace('_samp_to_dir', '')
-////				println "Processing sample file: ${sampleFile}"
-//				sampleFile.text.readLines().collect { line -> 
-//					def parts = line.split('\t')
-//					def dirPath = ont_reads_fq_dir + parts[0]
-////					println "Sample: ${sampleName}, Directory: ${dirPath}"
-//					[sampleName, file(dirPath)]
-//				}
-//			}
-//
-//		// get the files within each directory and keep track of the sample they belong to
-//		ch_files = ch_samples
-//			.flatMap { sampName, dir ->
-//				println "Processing directory: ${dir} for sample: ${sampName}"
-//				dir.listFiles().findAll { file -> 
-//					file.name.endsWith('.fastq.gz') && !isGzipFileEmpty(file.toFile())
-//				}
-//				.collect { file -> 
-//					def fileName = file.name
-//					[sampName, file]  // Return the tuple with the sample name, file
-//				}
-//			}
-//			.groupTuple()
-//			.flatMap { sampName, items -> {
-//				def counter = 0
-//				items.collate(500).collect { group ->
-//					counter += 1
-//					def files = group.collect { it }
-//					[sampName, counter, files]
-//					}
-//				}
-//			}
-
 	
 		CONVERT_NANOPORE(
 			GET_ALL_FASTQ_GZ.out.split_files

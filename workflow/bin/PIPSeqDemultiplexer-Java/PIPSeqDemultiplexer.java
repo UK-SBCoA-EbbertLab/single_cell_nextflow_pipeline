@@ -7,12 +7,17 @@ import java.io.*;
 import java.util.concurrent.*;
 
 public class PIPSeqDemultiplexer {
-	private static final Map<Path, StringBuilder> fileBuffers = new HashMap<>();
-	private static final Map<Path, Integer> fileBufferCurrentReadCount = new HashMap<>();
-	private static final Map<Path, Integer> fileBufferPrintedReadCount = new HashMap<>();
+	private static final Map<Path, StringBuffer> fileBuffers = new ConcurrentHashMap<>();
+	private static final Map<Path, Integer> fileBufferCurrentReadCount = new ConcurrentHashMap<>();
+	private static final Map<Path, Integer> fileBufferPrintedReadCount = new ConcurrentHashMap<>();
+
+	private static final int MAX_BUFFER_SIZE_CHARS = 5 * 1024 * 1024; //Flush buffer if it exceeds 5MB
 
 	public static void demultiplexPips(Path fastqR1, Path fastqR2, Set<String> barcodesToKeep, String sampleName) {
 
+		System.out.println("Processing paired files:");
+		System.out.println("Read 1: " + fastqR1);
+		System.out.println("Read 2: " + fastqR2);
 
 		if (Files.exists(fastqR1) && Files.exists(fastqR2)) {
 			try {
@@ -32,11 +37,6 @@ public class PIPSeqDemultiplexer {
 			System.exit(1);
 		}
 
-		/*
-		 * Write all buffers (cells).
-		 */
-		System.out.println("About to flush some buffers");
-		flushAllBuffers();
 	}
 
 	public static Set<String> readBarcodes(String inputFilePath) {
@@ -49,8 +49,7 @@ public class PIPSeqDemultiplexer {
 
 			while ((line = br.readLine()) != null) {
 				String[] columns = line.split("\t");
-				String barcode = columns[0];  // First column is the barcode
-				barcodes.add(barcode);
+				barcodes.add(columns[0]); //first column is the barcode
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -63,74 +62,49 @@ public class PIPSeqDemultiplexer {
 	public static void processFiles(String fastqR1, String fastqR2, Set<String> barcodesToKeep, String sampleName)
 			throws IOException {
 
-		String f1ReadName, f1Seq, f2ReadName;
-
-		/*
-		 * This String array should have four entries (one per line in a read)
-		 */
-		String[] f1Read, f2Read;
-
-		try {
-			BufferedReader file1Reader = new BufferedReader(
-					new InputStreamReader(new GZIPInputStream(new FileInputStream(fastqR1))));
-			BufferedReader file2Reader = new BufferedReader(
-					new InputStreamReader(new GZIPInputStream(new FileInputStream(fastqR2))));
+		try (BufferedReader file1Reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(fastqR1))));
+		     BufferedReader file2Reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(fastqR2))))) {
 
 			int readsProcessed = 0;
 			int readsKept = 0;
+			/*
+			 * This String array should have four entries (one per line in a read)
+			 */
+			String[] f1Read, f2Read;
 
-			f1Read = new String[4];
-			f2Read = new String[4];
-			while (true) {
+			while ((f1Read = getNextRead(file1Reader)) != null) {
+				f2Read = getNextRead(file2Reader);
+				
+				/*
+				 * file1 and file2 should match exactly in number of reads and in the order. If
+				 * they are ever out of sync, then something is wrong.
+				 */
+				if (!f1Read[0].equals(f2Read[0])) {
+					throw new IOException("ERROR: Expected a read but did not find one. Check"
+							+ " the input files are complete (i.e., not truncated).");
+				}
 
+				String barcode = f1Read[1].substring(0,16);
+				if (barcodesToKeep.contains(barcode)) {
+					Path outputFile = Paths.get(sampleName + "_" + barcode + ".fastq");
+					addToBuffer(outputFile, f2Read);
+					readsKept++;
+				}
+
+				readsProcessed++;
 				if (readsProcessed % 10000 == 0) {
 					System.out.println("Processed " + NumberFormat.getNumberInstance(Locale.US).format(readsProcessed)
 							+ " reads (" + NumberFormat.getNumberInstance(Locale.US).format(readsProcessed * 4)
 							+ " lines) in " + fastqR1 + "...");
 				}
-
-				f1Read = getNextRead(file1Reader);
-
-				/*
-				 * getNextRead will return null if we've reached the end
-				 */
-				if (f1Read == null) {
-					break;
-				}
-
-				f2Read = getNextRead(file2Reader);
-
-				f1ReadName = f1Read[0];
-				f1Seq = f1Read[1];
-
-				f2ReadName = f2Read[0];
-
-				/*
-				 * file1 and file2 should match exactly in number of reads and in the order. If
-				 * they are ever out of sync, then something is wrong.
-				 */
-				if (!f1ReadName.equals(f2ReadName)) {
-					throw new IOException("ERROR: Expected a read but did not find one. Check"
-							+ " the input files are complete (i.e., not truncated).");
-				}
-
-				if (barcodesToKeep.contains(f1Seq.substring(0, 16))) {
-					Path outputFile = Paths.get(sampleName + "_" + f1Seq.substring(0, 16) + ".fastq");
-					addToBuffer(outputFile, f2Read);
-					readsKept++;
-				}
-				readsProcessed++;
-
 			}
 
-			System.out.println(readsKept);
+			System.out.println("Reads kept: " + readsKept);
 
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			System.exit(1);
-
 		}
-
 	}
 
 	/**
@@ -144,17 +118,14 @@ public class PIPSeqDemultiplexer {
 	public static String[] getNextRead(BufferedReader fileReader) throws IOException {
 
 		String[] linesForRead = new String[4];
-		String line;
-		line = fileReader.readLine();
-		if (line != null) {
-			linesForRead[0] = line;
+		linesForRead[0] = fileReader.readLine();
+		if (linesForRead[0] != null) {
 			linesForRead[1] = fileReader.readLine();
 			linesForRead[2] = fileReader.readLine();
 			linesForRead[3] = fileReader.readLine();
 
 			return linesForRead;
 		}
-
 		return null;
 	}
 
@@ -166,55 +137,47 @@ public class PIPSeqDemultiplexer {
 	 * @param path
 	 * @param lines
 	 */
-	public static synchronized void addToBuffer(Path path, String[] lines) {
-		try {
-			StringBuilder buffer = fileBuffers.getOrDefault(path, new StringBuilder());
-			Integer currentBufferReadCount = fileBufferCurrentReadCount.getOrDefault(path, 0);
-			
-			for (String line : lines) {
-				buffer.append(line).append("\n");
+	public static void addToBuffer(Path path, String[] lines) {
+		fileBuffers.compute(path, (key, buffer) -> {
+			if (buffer == null) buffer = new StringBuffer();
+			synchronized (buffer) {
+				for (String line: lines) {
+					buffer.append(line).append("\n");
+				}
+		
+				fileBufferCurrentReadCount.merge(path, 1, Integer::sum);
+
+				// Check if buffer size exceeds the maximum size in bytes
+				if (buffer.length() >= MAX_BUFFER_SIZE_CHARS) {
+					flushBuffer(path, buffer);
+				}
+				return buffer;
 			}
+		});
 
-			/*
-			 * Increment the number of reads in the buffer by one and store in HashMap.
-			 */
-			currentBufferReadCount++;
-			fileBufferCurrentReadCount.put(path, currentBufferReadCount);
-
-			fileBuffers.put(path, buffer);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			System.exit(1);
-		}
 	}
 
-	public static synchronized void flushBuffer(Path path, StringBuilder buffer) {
-		// Ensure the file extension is .gz
-		// if (!path.toString().endsWith(".gz")) {
-		// path = Paths.get(path.toString() + ".gz");
-		// }
-		try (FileOutputStream outputStream = new FileOutputStream(path.toFile(), true)) {
-			// try (FileOutputStream outputStream = new FileOutputStream(path.toFile(),
-			// true)) {
-			// gzipOutputStream.write(buffer.toString().getBytes());
-			outputStream.write(buffer.toString().getBytes());
-			buffer.setLength(0);
+	public static void flushBuffer(Path path, StringBuffer buffer) {
+		synchronized (buffer) {
 			/*
-			 * Track how many reads have been written to/from this buffer so far. Also reset
-			 * the number of reads left in the buffer to zero.
+			 * Write all buffers (cells).
 			 */
-			// Get how many have already been printed to file
-			Integer bufferPrintedReadsSoFar = fileBufferPrintedReadCount.getOrDefault(path, Integer.valueOf(0)); 
-			// Get how many reads were in the buffer before printing
-			Integer currentBufferReadCount = fileBufferCurrentReadCount.getOrDefault(path, Integer.valueOf(0)); 
-			// Set the number of reads printed to be what was previously printed plus what was just printed
-			fileBufferPrintedReadCount.put(path, bufferPrintedReadsSoFar + currentBufferReadCount); 
-			// Set the number of reads left in the buffer to zero.
-			fileBufferCurrentReadCount.put(path, 0); 
+			System.out.println("About to flush some buffers");
+			try (FileOutputStream outputStream = new FileOutputStream(path.toFile(), true)) {
+				// write buffer contents to file
+				outputStream.write(buffer.toString().getBytes());
+		
+				// update read counts
+				int currentBufferReadCount = fileBufferCurrentReadCount.getOrDefault(path, 0); 
+				fileBufferPrintedReadCount.merge(path, currentBufferReadCount, Integer::sum); 
 
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(1);
+				// Set the number of reads left in the buffer to zero.
+				fileBufferCurrentReadCount.put(path, 0); 
+				buffer.setLength(0);
+			} catch (IOException e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
 		}
 	}
 
@@ -223,78 +186,25 @@ public class PIPSeqDemultiplexer {
 	 * previously printed) meet our inclusion criteria. This ensures we don't throw
 	 * out any reads that remain if the given buffer has already been printed out.
 	 */
-	public static synchronized void flushAllBuffers() {
-
-		//int bufferPrintedReadsSoFar, currentBufferReadCount;
-		System.out.println("In the flush buffer function");
-		for (Map.Entry<Path, StringBuilder> entry : fileBuffers.entrySet()) {
-
-			/*
-			 * Get how many have already been printed to file. Must allow default of zero
-			 * here because only those that have already printed to a file will be in this
-			 * map.
-			 */
-			//bufferPrintedReadsSoFar = fileBufferPrintedReadCount.getOrDefault(entry.getKey(), Integer.valueOf(0));
-			/*
-			 * Get how many reads are in the buffer. Do not allow a default here, because if
-			 * if the current buffer doesn't already exist in the map, something has gone
-			 * wrong elsewhere.
-			 */
-			//currentBufferReadCount = fileBufferCurrentReadCount.get(entry.getKey());
-
-			flushBuffer(entry.getKey(), entry.getValue());
-		}
+	public static void flushAllBuffers() {
+		System.out.println("Flushing all buffers...");
+		fileBuffers.forEach((path, buffer) -> flushBuffer(path, buffer));
 	}
 
-	public static void writeRemainingLineCountsHistogramToFile(String sampleName, int readsThresh) {
-		StringBuilder outputBuffer = new StringBuilder();
-
-		System.out.println("TESTING IF THE CURRENT BUFFER IS EMPTY");
-		fileBufferCurrentReadCount.forEach((path, count) -> {
-    			if (count != 0) {
-				System.out.println("Path: " + path + ", Count: " + count);
-			}
-		});
-
-		// Add table header to output buffer
-		outputBuffer.append("Buffer Name\tRead Count\n");
-
-
-
-		try {
-
-			System.out.println("\nNumber of buffers (cells) left: " + fileBuffers.size());
-
-			FileWriter writer = new FileWriter(sampleName  + "_counts_histogram.txt");
-			writer.write("Num reads: Counts\n");
-
-			// Map to store the histogram data
-			Map<Integer, Integer> histogramData = new TreeMap<>();
-
-			// Calculate line counts for each buffer and add to output buffer
-			for (Map.Entry<Path, Integer> entry : fileBufferPrintedReadCount.entrySet()) {
-
-				int readCount = entry.getValue();
-
-				if (readCount > readsThresh) {
-					histogramData.put(readCount, histogramData.getOrDefault(readCount, 0) + 1);
-				} else {
-					Path rmPath = entry.getKey();
-					Files.delete(rmPath);
-					System.out.println("Deleted file: " + rmPath + "    Nreads: " + readCount);
+	public static void writeBarcodesCountsToFile(String sampleName) {
+		System.out.println("Writing barcode counts...");
+		try(FileWriter writer = new FileWriter(sampleName  + "_barcode_counts.txt")) {
+			writer.write("Barcode\tReads\n");
+			fileBufferPrintedReadCount.forEach((path, count) -> {
+				try {
+					writer.write(path + "\t" + count + "\n");
+				} catch (IOException e) {
+					System.err.println("Error writing to file: " + e.getMessage());
+					System.exit(1);
 				}
-			}
-
-			for (Map.Entry<Integer, Integer> entry : histogramData.entrySet()) {
-				writer.write(entry.getKey() + ": " + entry.getValue() + "\n");
-			}
-
-			writer.close();
-		} catch (java.nio.file.NoSuchFileException e) {
-			System.err.println("File not found: " + e.getMessage());
-			System.exit(1);
+			});
 		} catch (IOException e) {
-			System.err.println("Error writing to file: " + e.getMessage());
+			System.err.println("Error writing barcode counts: " + e.getMessage());
 			System.exit(1);
 		}
 	}
@@ -302,49 +212,79 @@ public class PIPSeqDemultiplexer {
 	public static void main(String[] args) {
 
 		if (args.length != 4) {
-			System.out.println("Usage: FastqFilter <barcodesToKeep> <sampleName> <dir_to_fastqs> <readsThreshold>");
+			System.out.println("Usage: PIPSeqDemultiplexer <barcodesToKeep> <sampleName> <dir_to_fastqs> <numThreads>");
 			return;
 		}
 		
+		// Initialize passed parameters:
+		// barToKeep --> the barcodes that we will be keeping
+		// sampleName --> name of the sample we are demultiplexing for
+		// fastqsDir --> the directory where the paired fastqs we will be demultiplexing are located
+		// numThreads --> the number of threads we will be working with
 		String barToKeep = Paths.get(args[0]).toAbsolutePath().toString();
 		String sampleName = args[1];
-		String fastqsDir = args[2];
-		int readsThresh = Integer.parseInt(args[3]);
+		Path fastqsDir = Paths.get(args[2]);
+		int numThreads = Integer.parseInt(args[3]);
+
+		// Instantiate the executor
+		ExecutorService executor = Executors.newFixedThreadPool(numThreads);
 
 		try {
-			// get the path to the directory containing the paired fastq files
-			Path directory = Paths.get(fastqsDir);
 			Set<String> barcodesToKeep = readBarcodes(barToKeep);
 
 			// Collect all files with .fastq or .fq extension
-			Map<String, List<Path>> pairedFiles = Files.list(directory)
+			Map<String, List<Path>> pairedFiles = Files.list(fastqsDir)
 				.filter(file -> Files.isRegularFile(file) && (file.toString().endsWith("_R1.fastq.gz") || file.toString().endsWith("_R2.fastq.gz")))
 				.collect(Collectors.groupingBy(file -> file.getFileName().toString().replaceAll("_R[12]\\.fastq\\.gz$", "")));
+
+			List<Future<Void>> futures = new ArrayList<>();
 
 			// Loop through each pair
 			for (Map.Entry<String, List<Path>> entry : pairedFiles.entrySet()) {
 				List<Path> pair = entry.getValue();
 				if (pair.size() == 2) {
-					Path r1 = pair.get(0).getFileName().toString().contains("_R1") ? pair.get(0) : pair.get(1);
-					Path r2 = pair.get(0).getFileName().toString().contains("_R1") ? pair.get(1) : pair.get(0);
+					final Path r1 = pair.get(0).getFileName().toString().contains("_R1") ? pair.get(0) : pair.get(1);
+					final Path r2 = pair.get(0).getFileName().toString().contains("_R1") ? pair.get(1) : pair.get(0);
 	
-					System.out.println("Processing paired files:");
-					System.out.println("Read 1: " + r1);
-					System.out.println("Read 2: " + r2);
+					// Perform your processing on r1 and r2 here
+					futures.add(executor.submit(() -> {
+						demultiplexPips(r1, r2, barcodesToKeep, sampleName);
+						return null;
+					}));
 	
-					demultiplexPips(r1, r2, barcodesToKeep, sampleName);
-	
-				// Perform your processing on r1 and r2 here
 				} else {
 					System.out.println("Unpaired file detected: " + entry.getKey());
 				}
-			} 
-			writeRemainingLineCountsHistogramToFile(sampleName, readsThresh);
+			}
+
+			for (Future<Void> future : futures) {
+				try {
+					future.get();
+				} catch (Exception e) {
+					e.printStackTrace();
+					System.out.println("FUTURE FAILED");
+					System.exit(1);
+				}
+			}
+			flushAllBuffers();
+			writeBarcodesCountsToFile(sampleName);
+
+			executor.shutdown();
+			try {
+				if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+					executor.shutdownNow();
+				}
+			} catch (InterruptedException e) {
+				executor.shutdownNow();
+			}
+
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(1);
 			
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.exit(1);
 		}
 	}
-
 }
