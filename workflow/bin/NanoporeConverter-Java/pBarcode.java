@@ -30,7 +30,7 @@ public class pBarcode implements Serializable {
 	public boolean tier2isAmb;
 	public boolean tier3isAmb;
 	public boolean tier4isAmb;
-	
+
 	private String ogTier1;
 	private String ogTier2;
 	private String ogTier3;
@@ -40,7 +40,10 @@ public class pBarcode implements Serializable {
 	private String ogL2;
 	private String ogL3;
 
-	public int totalLD;
+	public int totalAmbiguousLVD;
+
+	private boolean discard;
+	private boolean empty;
 	
 	private int start;
 	private int end;
@@ -112,7 +115,8 @@ public class pBarcode implements Serializable {
 		this.tier4isAmb = false;
 		this.start = 0;
 		this.end = 0;
-		this.totalLD = 0;
+		this.totalAmbiguousLVD = 0;
+		this.empty = true;
 	}
 
 	public pBarcode(Matcher matcher, String input) {
@@ -143,7 +147,8 @@ public class pBarcode implements Serializable {
 		// Set the length of the final pBarcode
 		this.length = this.pBarcode.length();
 		
-		this.totalLD = 0;
+		this.totalAmbiguousLVD = 0;
+		this.empty = false;
 	}
 
 	private String processTier(String tier, String[] tierArray, int minDist, int tierVal) {
@@ -167,8 +172,13 @@ public class pBarcode implements Serializable {
 		System.out.println(minDistance);
 		System.out.println(ties.size());
 
+		if (minDistance > minDist) {
+			this.discard = true;
+			return tier;
+		}
+
 		// Handle ambiguity
-		if (ties.size() > 1 || minDistance > minDist) {
+		if (ties.size() > 1) {
 			if (tierVal == 1) {
 				this.tier1isAmb = true;
 				return tier;
@@ -194,13 +204,29 @@ public class pBarcode implements Serializable {
 		return tier;
 	}
 
+	public boolean isUsableBarcode() {
+		return !discard;
+	}
+
+	public boolean isEmptyBarcode() {
+		return empty;
+	}
+
 	public boolean isAmbiguous() {
 		return this.tier1isAmb || this.tier2isAmb || this.tier3isAmb || this.tier4isAmb;
 	}
 
+	public int getStartIndex() {
+		return this.start;
+	}
+
+	public int getEndIndex() {
+		return this.end;
+	}
+
 	public String getBarcodeQualFromString(String qual) {
 		// for simplicity's sake, we will set the barcode quality to 'perfect' and then grab the quality of the molecular identifier
-		if (qual.length() < end + 15) {
+		if (qual.length() < end + 12) {
 			return "ERROR";
 		} else {
 			return "~".repeat(39) + qual.substring(end, end + 15);
@@ -265,24 +291,24 @@ public class pBarcode implements Serializable {
 		
 		for (pBarcode barc : potentialBarcodes) {
 			if(this.tier1isAmb) {
-				barc.totalLD += LevenshteinDistance.computeLevenshteinDistance(this.tier1, barc.tier1);
+				barc.totalAmbiguousLVD += LevenshteinDistance.computeLevenshteinDistance(this.tier1, barc.tier1);
 			}
 			if(this.tier2isAmb) {
-				barc.totalLD += LevenshteinDistance.computeLevenshteinDistance(this.tier2, barc.tier2);
+				barc.totalAmbiguousLVD += LevenshteinDistance.computeLevenshteinDistance(this.tier2, barc.tier2);
 			}
 			if(this.tier3isAmb) {
-				barc.totalLD += LevenshteinDistance.computeLevenshteinDistance(this.tier3, barc.tier3);
+				barc.totalAmbiguousLVD += LevenshteinDistance.computeLevenshteinDistance(this.tier3, barc.tier3);
 			}
 			if(this.tier4isAmb) {
-				barc.totalLD += LevenshteinDistance.computeLevenshteinDistance(this.tier4, barc.tier4);
+				barc.totalAmbiguousLVD += LevenshteinDistance.computeLevenshteinDistance(this.tier4, barc.tier4);
 			}
 			
-			if (barc.totalLD < minLDist) {
-				minLDist = barc.totalLD;
+			if (barc.totalAmbiguousLVD < minLDist) {
+				minLDist = barc.totalAmbiguousLVD;
 				closest = barc;
 				ties.clear();
 				ties.add(barc);
-			} else if (barc.totalLD == minLDist) {
+			} else if (barc.totalAmbiguousLVD == minLDist) {
 				ties.add(barc);
 			}
 		}

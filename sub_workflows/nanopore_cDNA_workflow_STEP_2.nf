@@ -3,7 +3,7 @@ include {MAKE_FAI} from '../modules/make_fai'
 include {MAKE_INDEX_cDNA ; MAKE_INDEX_cDNA_CONTAMINATION_CHM13} from '../modules/make_index'
 include {MAKE_INDEX_cDNA as MAKE_INDEX_CONTAMINANTS} from '../modules/make_index'
 include {CHM13_GTF; CHM13_GTF_ERCC} from '../modules/chm13_gff3_to_gtf'
-include {PYCHOPPER} from '../modules/pychopper'
+//include {PYCHOPPER} from '../modules/pychopper'
 include {PYCOQC} from '../modules/pycoqc'
 include {MINIMAP2_cDNA; FILTER_BAM} from '../modules/minimap2'
 include {RSEQC} from '../modules/rseqc'
@@ -29,7 +29,7 @@ workflow NANOPORE_cDNA_STEP_2 {
     main:
         MAKE_FAI(ref)
         MAKE_INDEX_cDNA(ref)
-        PYCHOPPER(ont_reads_fq, ont_reads_txt, cdna_kit)
+  //      PYCHOPPER(ont_reads_fq, ont_reads_txt, cdna_kit)
         MINIMAP2_cDNA(ont_reads_fq,  MAKE_INDEX_cDNA.out, ont_reads_txt)
         FILTER_BAM(MINIMAP2_cDNA.out.id, mapq, MINIMAP2_cDNA.out.bam, MINIMAP2_cDNA.out.bai, mapped_reads_thresh)
         BAMBU_PREP(FILTER_BAM.out.id, mapq, FILTER_BAM.out.bam, FILTER_BAM.out.bai, ref, annotation, MAKE_FAI.out, track_reads)

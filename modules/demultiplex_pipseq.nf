@@ -1,9 +1,9 @@
 process DEMULTIPLEX {
 
-        publishDir "results/${params.out_dir}/pre_processing/demultiplexed/${sampName}/", mode: "copy"
+        publishDir "results/${params.out_dir}/pre_processing/06_demultiplexed/${sampName}/", mode: "copy", pattern: "*.fastq"
+        publishDir "results/${params.out_dir}/pre_processing/stats/${sampName}/", mode: "copy", pattern: "*.txt"
 
 	label 'demultiplexing'
-	//label 'barcoding'
 
 	input:
 		tuple val(sampName), path(barcoded_fastq_R1), path(barcoded_fastq_R2), path(barcodes_to_keep)

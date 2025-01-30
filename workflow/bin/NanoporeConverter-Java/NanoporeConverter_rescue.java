@@ -15,39 +15,51 @@ public class NanoporeConverter_rescue {
 	private static final String REVERSE_MAP = "ACGTacgt";
 	private static final String REVERSE_COMPLEMENT_MAP = "TGCATGCA";
 
-	private static final List<String> PATTERNS = Arrays.asList(
+	private static final List<Pattern> COMPILED_PATTERNS = Arrays.asList(
 	// We don't modify the 8 at the beginning or end because there are extra
 	// characters that we just take
 //            ".{8}ATG.{6}GAG.{6}TCGAG.{8}",
-			"(.{8})(ATG)(.{6})(GAG)(.{6})(TCGAG)(.{8})",
-
-			// Barcode indels
-			"(.{8})(ATG)(.{5})(GAG)(.{6})(TCGAG)(.{8})", "(.{8})(ATG)(.{7})(GAG)(.{6})(TCGAG)(.{8})",
-			"(.{8})(ATG)(.{6})(GAG)(.{5})(TCGAG)(.{8})", "(.{8})(ATG)(.{6})(GAG)(.{7})(TCGAG)(.{8})",
 //            ".{8}ATG.{5}GAG.{6}TCGAG.{8}", ".{8}ATG.{7}GAG.{6}TCGAG.{8}",
 //            ".{8}ATG.{6}GAG.{5}TCGAG.{8}", ".{8}ATG.{6}GAG.{7}TCGAG.{8}",
-
-			// Linker mismatches
-			"(.{8})(.TG)(.{6})(GAG)(.{6})(TCGAG)(.{8})", "(.{8})(A.G)(.{6})(GAG)(.{6})(TCGAG)(.{8})",
-			"(.{8})(AT.)(.{6})(GAG)(.{6})(TCGAG)(.{8})", "(.{8})(ATG)(.{6})(.AG)(.{6})(TCGAG)(.{8})",
-			"(.{8})(ATG)(.{6})(G.G)(.{6})(TCGAG)(.{8})", "(.{8})(ATG)(.{6})(GA.)(.{6})(TCGAG)(.{8})",
-			"(.{8})(ATG)(.{6})(GAG)(.{6})(.CGAG)(.{8})", "(.{8})(ATG)(.{6})(GAG)(.{6})(T.GAG)(.{8})",
-			"(.{8})(ATG)(.{6})(GAG)(.{6})(TC.AG)(.{8})", "(.{8})(ATG)(.{6})(GAG)(.{6})(TCG.G)(.{8})",
-			"(.{8})(ATG)(.{6})(GAG)(.{6})(TCGA.)(.{8})",
 //            ".{9}TG.{6}GAG.{6}TCGAG.{8}", ".{8}A.G.{6}GAG.{6}TCGAG.{8}", ".{8}AT.{7}GAG.{6}TCGAG.{8}",
 //            ".{8}ATG.{7}AG.{6}TCGAG.{8}", ".{8}ATG.{6}G.G.{6}TCGAG.{8}", ".{8}ATG.{6}GA.{7}TCGAG.{8}",
 //            ".{8}ATG.{6}GAG.{7}CGAG.{8}", ".{8}ATG.{6}GAG.{6}T.GAG.{8}", ".{8}ATG.{6}GAG.{6}TC.AG.{8}",
 //            ".{8}ATG.{6}GAG.{6}TCG.G.{8}", ".{8}ATG.{6}GAG.{6}TCGA.{9}",
-
-			// Linker insertions
-			"(.{8})(A.TG)(.{6})(GAG)(.{6})(TCGAG)(.{8})", "(.{8})(AT.G)(.{6})(GAG)(.{6})(TCGAG)(.{8})",
-			"(.{8})(ATG)(.{6})(G.AG)(.{6})(TCGAG)(.{8})", "(.{8})(ATG)(.{6})(GA.G)(.{6})(TCGAG)(.{8})",
-			"(.{8})(ATG)(.{6})(GAG)(.{6})(T.CGAG)(.{8})", "(.{8})(ATG)(.{6})(GAG)(.{6})(TC.GAG)(.{8})",
-			"(.{8})(ATG)(.{6})(GAG)(.{6})(TCG.AG)(.{8})", "(.{8})(ATG)(.{6})(GAG)(.{6})(TCGA.G)(.{8})"
 //            ".{8}A.TG.{6}GAG.{6}TCGAG.{8}", ".{8}AT.G.{6}GAG.{6}TCGAG.{8}", ".{8}ATG.{6}G.AG.{6}TCGAG.{8}",
 //            ".{8}ATG.{6}GA.G.{6}TCGAG.{8}", ".{8}ATG.{6}GAG.{6}T.CGAG.{8}", ".{8}ATG.{6}GAG.{6}TC.GAG.{8}",
 //            ".{8}ATG.{6}GAG.{6}TCG.AG.{8}", ".{8}ATG.{6}GAG.{6}TCGA.G.{8}" 
-	);
+
+		// Perfect Pattern Match
+		Pattern.compile("(.{8})(ATG)(.{6})(GAG)(.{6})(TCGAG)(.{8})"),
+
+		// Barcode indels
+		Pattern.compile("(.{8})(ATG)(.{5})(GAG)(.{6})(TCGAG)(.{8})"), 
+		Pattern.compile("(.{8})(ATG)(.{7})(GAG)(.{6})(TCGAG)(.{8})"),
+		Pattern.compile("(.{8})(ATG)(.{6})(GAG)(.{5})(TCGAG)(.{8})"), 
+		Pattern.compile("(.{8})(ATG)(.{6})(GAG)(.{7})(TCGAG)(.{8})"),
+
+		// Linker mismatches
+		Pattern.compile("(.{8})(.TG)(.{6})(GAG)(.{6})(TCGAG)(.{8})"), 
+		Pattern.compile("(.{8})(A.G)(.{6})(GAG)(.{6})(TCGAG)(.{8})"),
+		Pattern.compile("(.{8})(AT.)(.{6})(GAG)(.{6})(TCGAG)(.{8})"), 
+		Pattern.compile("(.{8})(ATG)(.{6})(.AG)(.{6})(TCGAG)(.{8})"),
+		Pattern.compile("(.{8})(ATG)(.{6})(G.G)(.{6})(TCGAG)(.{8})"), 
+		Pattern.compile("(.{8})(ATG)(.{6})(GA.)(.{6})(TCGAG)(.{8})"),
+		Pattern.compile("(.{8})(ATG)(.{6})(GAG)(.{6})(.CGAG)(.{8})"), 
+		Pattern.compile("(.{8})(ATG)(.{6})(GAG)(.{6})(T.GAG)(.{8})"),
+		Pattern.compile("(.{8})(ATG)(.{6})(GAG)(.{6})(TC.AG)(.{8})"), 
+		Pattern.compile("(.{8})(ATG)(.{6})(GAG)(.{6})(TCG.G)(.{8})"),
+		Pattern.compile("(.{8})(ATG)(.{6})(GAG)(.{6})(TCGA.)(.{8})"),
+
+		// Linker insertions
+		Pattern.compile("(.{8})(A.TG)(.{6})(GAG)(.{6})(TCGAG)(.{8})"), 
+		Pattern.compile("(.{8})(AT.G)(.{6})(GAG)(.{6})(TCGAG)(.{8})"),
+		Pattern.compile("(.{8})(ATG)(.{6})(G.AG)(.{6})(TCGAG)(.{8})"), 
+		Pattern.compile("(.{8})(ATG)(.{6})(GA.G)(.{6})(TCGAG)(.{8})"),
+		Pattern.compile("(.{8})(ATG)(.{6})(GAG)(.{6})(T.CGAG)(.{8})"), 
+		Pattern.compile("(.{8})(ATG)(.{6})(GAG)(.{6})(TC.GAG)(.{8})"),
+		Pattern.compile("(.{8})(ATG)(.{6})(GAG)(.{6})(TCG.AG)(.{8})"), 
+		Pattern.compile("(.{8})(ATG)(.{6})(GAG)(.{6})(TCGA.G)(.{8})"));
 
 	public static String getBaseName(String fileName) {
 		int firstDotIndex = fileName.indexOf('.');
@@ -55,6 +67,202 @@ public class NanoporeConverter_rescue {
 			return fileName; // No extension found
 		}
 		return fileName.substring(0, firstDotIndex);
+	}
+
+	public static pBarcode check_forward_read(String f_read) {
+		pBarcode f_barcode = new pBarcode();
+		// Check to see if the line has the barcode pattern
+		for (Pattern compiledPattern : COMPILED_PATTERNS) {
+			Matcher matcher = compiledPattern.matcher(f_read);
+			// If we find a barcode pattern match, create a barcode object and stop looking for a match
+			if (matcher.find()) {
+				f_barcode = new pBarcode(matcher, f_read);
+				System.out.println("in forward match :" + f_barcode.getStartIndex() + "   " + f_barcode.getEndIndex());
+				System.out.println("OGbarcode: " + f_barcode.ogBarcode + "  processedBarcode: " + f_barcode.pBarcode);
+				break;
+			}
+		}
+		return f_barcode; 
+	}
+
+	public static pBarcode check_reverse_complement_read(String f_read) {
+		pBarcode rc_barcode = new pBarcode();
+		String rc_read = getReverseComplement(f_read);
+
+		// Check to see if the line has the barcode pattern
+		for (Pattern compiledPattern : COMPILED_PATTERNS) {
+			Matcher matcher = compiledPattern.matcher(rc_read);
+			// If we find a barcode pattern match, create a barcode object and stop looking for a match
+			if (matcher.find()) {
+				rc_barcode = new pBarcode(matcher, rc_read);
+				System.out.println("in reverse complement match :" + rc_barcode.getStartIndex() + "   " + rc_barcode.getEndIndex());
+				System.out.println("OGbarcode: " + rc_barcode.ogBarcode + "  processedBarcode: " + rc_barcode.pBarcode);
+				break;
+			}
+		}
+		return rc_barcode;
+	}
+
+	public static void incrementValue(Map<String, Integer> map, String key) {
+		map.put(key, map.getOrDefault(key, 0) + 1);
+	}
+
+	public static String compare_barcodes_and_determine_action(pBarcode f_barcode, pBarcode rc_barcode, String read, Map<String, Integer> theStats, 
+			HashMap<String, Set<pBarcode>> tier1map, HashMap<String, Set<pBarcode>> tier2map, 
+			HashMap<String, Set<pBarcode>> tier3map, HashMap<String, Set<pBarcode>> tier4map) {
+		// this function will return strings for what action to take (f_barcode, rc_barcode, discard) 
+		// as well as update the stats map
+		// Both the barcodes are empty, this read didn't have a barcode
+		if (f_barcode.isEmptyBarcode() && rc_barcode.isEmptyBarcode()) {
+			incrementValue(theStats, "noPatternMatch");
+			incrementValue(theStats, "nTotalDiscardedReads");
+			return "discard";
+
+		// if only the f_barcode was found
+		} else if (rc_barcode.isEmptyBarcode()) {
+			incrementValue(theStats, "fPatternMatch");
+			// if the f_barcode is usable
+			if (f_barcode.isUsableBarcode()) {
+				incrementValue(theStats, "fUndecidedBarcode");
+				// check first to see if the barcode is ambiguous
+				if (f_barcode.isAmbiguous()) {
+					// If the barcode is ambiguous, we want to try to rescue the barcode
+					f_barcode.rescueBarcode(tier1map, tier2map, tier3map, tier4map);
+					if (!f_barcode.isAmbiguous()) {
+						if (read.length() > f_barcode.getEndIndex() + 51) {
+							return "f_barcode";
+						} else {
+							incrementValue(theStats, "nTotalDiscardedReads");
+							incrementValue(theStats, "nTotalTooShortReads");
+							return "discard";
+						}
+					} else {
+						incrementValue(theStats, "nTotalDiscardedReads");
+						return "discard";
+					}
+				} else {
+					if (read.length() > f_barcode.getEndIndex() + 51) {
+						return "f_barcode";
+					} else {
+						incrementValue(theStats, "nTotalDiscardedReads");
+						incrementValue(theStats, "nTotalTooShortReads");
+						return "discard";
+					}
+				}
+			} else {
+				// the barcode is not usable, we need to throw this to the discarded file
+				incrementValue(theStats, "nTotalDiscardedReads");
+				return "discard";
+			}
+
+		// if only the rc_barcode was found
+		} else if (f_barcode.isEmptyBarcode()) {
+			incrementValue(theStats, "rcPatternMatch");
+			// if the barcode is usable
+			if (rc_barcode.isUsableBarcode()) {
+				incrementValue(theStats, "rcUndecidedBarcode");
+				// check first to see if the barcode is ambiguous
+				if (rc_barcode.isAmbiguous()) {
+					// If the barcode is ambiguous, we want to try to rescue the barcode
+					rc_barcode.rescueBarcode(tier1map, tier2map, tier3map, tier4map);
+					if (!rc_barcode.isAmbiguous()) {
+						if (read.length() > rc_barcode.getEndIndex() + 51) {
+							return "rc_barcode";
+						} else {
+							incrementValue(theStats, "nTotalDiscardedReads");
+							incrementValue(theStats, "nTotalTooShortReads");
+							return "discard";
+						}
+
+					} else {
+						incrementValue(theStats, "nTotalDiscardedReads");
+						return "discard";
+					}
+				} else {
+					if (read.length() > rc_barcode.getEndIndex() + 51) {
+						return "rc_barcode";
+					} else {
+						incrementValue(theStats, "nTotalDiscardedReads");
+						incrementValue(theStats, "nTotalTooShortReads");
+						return "discard";
+					}
+				}
+			} else {
+				// the barcode is not usable, we need to throw this to the discarded file
+				incrementValue(theStats, "nTotalDiscardedReads");
+				return "discard";
+			}
+
+		// if they are both NOT empty
+		} else {
+			incrementValue(theStats, "bothPatternMatch");
+			if (!f_barcode.isUsableBarcode() && !rc_barcode.isUsableBarcode()) {
+				incrementValue(theStats, "nTotalDiscardedReads");
+				incrementValue(theStats, "bothBothDiscard");
+				return "discard";
+			} else if (f_barcode.isUsableBarcode() && rc_barcode.isUsableBarcode()) {
+				incrementValue(theStats, "nTotalDiscardedReads");
+				incrementValue(theStats, "bothBothUndecidedBarcode");
+				return "discard";
+			} else if (f_barcode.isUsableBarcode()) {
+				incrementValue(theStats, "bothFUndecidedBarcode");
+				if (f_barcode.isAmbiguous()) {
+					// If the barcode is ambiguous, we want to try to rescue the barcode
+					f_barcode.rescueBarcode(tier1map, tier2map, tier3map, tier4map);
+					if (!f_barcode.isAmbiguous()) {
+						if (read.length() > f_barcode.getEndIndex() + 51) {
+							return "f_barcode";
+						} else {
+							incrementValue(theStats, "nTotalDiscardedReads");
+							incrementValue(theStats, "nTotalTooShortReads");
+							return "discard";
+						}
+					} else {
+						incrementValue(theStats, "nTotalDiscardedReads");
+						return "discard";
+					}
+				} else {
+					if (read.length() > f_barcode.getEndIndex() + 51) {
+						return "f_barcode";
+					} else {
+						incrementValue(theStats, "nTotalDiscardedReads");
+						incrementValue(theStats, "nTotalTooShortReads");
+						return "discard";
+					}
+				}
+			} else if (rc_barcode.isUsableBarcode()) {
+				incrementValue(theStats, "bothRcUndecidedBarcode");
+				if (rc_barcode.isAmbiguous()) {
+					// If the barcode is ambiguous, we want to try to rescue the barcode
+					rc_barcode.rescueBarcode(tier1map, tier2map, tier3map, tier4map);
+					if (!rc_barcode.isAmbiguous()) {
+						if (read.length() > rc_barcode.getEndIndex() + 51) {
+							return "rc_barcode";
+						} else {
+							incrementValue(theStats, "nTotalDiscardedReads");
+							incrementValue(theStats, "nTotalTooShortReads");
+							return "discard";
+						}
+					} else {
+						incrementValue(theStats, "nTotalDiscardedReads");
+						return "discard";
+					}
+				} else {
+					if (read.length() > rc_barcode.getEndIndex() + 51) {
+						return "rc_barcode";
+					} else {
+						incrementValue(theStats, "nTotalDiscardedReads");
+						incrementValue(theStats, "nTotalTooShortReads");
+						return "discard";
+					}
+				}
+			} else {
+				System.err.println("THIS SHOULD NEVER HAPPEN. LOOK IN COMPARE AND DETERMINE ACTION");
+				System.exit(1);
+			}
+
+		} 
+		return "ERROR";
 	}
 
 	public static void main(String[] args) {
@@ -78,13 +286,6 @@ public class NanoporeConverter_rescue {
 //
 //        File[] fastqFiles = new File(sourceDir).listFiles((dir, name) -> name.endsWith(".fastq.gz"));
 
-//        if (fastqFiles == null || fastqFiles.length == 0) {
-//            System.err.println("No .fastq.gz files found in the source directory.");
-//            System.exit(1);
-//        }
-
-//	System.out.println("fastq files" + Arrays.toString(fastqFiles));
-
 		// for (File fastqFile : fastqFiles) {
 		// Submit each file processing as a separate task
 		Future<?> future = executor.submit(() -> {
@@ -96,8 +297,6 @@ public class NanoporeConverter_rescue {
 				// Prepare output files for writing
 				String r1Out = baseFileName + "_standard_R1_rescued.fastq.gz";
 				String r2Out = baseFileName + "_standard_R2_rescued.fastq.gz";
-//			System.out.println(r1Out);
-//			System.out.println(r2Out);
 
 				try {
 					File r1 = new File(r1Out);
@@ -116,8 +315,6 @@ public class NanoporeConverter_rescue {
 					e.printStackTrace();
 					System.exit(1);
 				}
-
-//			System.out.println(fastqFile);
 
 				// Clear or initialize output files
 				try {
@@ -184,9 +381,27 @@ public class NanoporeConverter_rescue {
 		 */
 		List<String> r1Buffer = new ArrayList<>();
 		List<String> r2Buffer = new ArrayList<>();
-		List<String> skippedBuffer = new ArrayList<>();
-		List<String> skippedStatsBuffer = new ArrayList<>();
+		List<String> discardedBuffer = new ArrayList<>();
+		List<String> statsBuffer = new ArrayList<>();
 //	    System.out.println(fastqFile);
+			
+		// STATS
+		Map<String, Integer> stats = new HashMap<>();
+		stats.put("noPatternMatch", 0);
+		stats.put("rcPatternMatch", 0);
+		stats.put("rcUndecidedBarcode", 0);
+		stats.put("fPatternMatch", 0);
+		stats.put("fUndecidedBarcode", 0);
+		stats.put("bothPatternMatch", 0);
+		stats.put("bothRcUndecidedBarcode", 0);
+		stats.put("bothFUndecidedBarcode", 0);
+		stats.put("bothBothUndecidedBarcode", 0);
+		stats.put("bothBothDiscard", 0);
+		stats.put("nTotalReads", 0);
+		stats.put("nTotalSkippedReads", 0);
+		stats.put("nTotalDiscardedReads", 0);
+		stats.put("nTotalTooShortReads", 0);
+		stats.put("nTotalKeptReads", 0);
 
 		try (BufferedReader reader = new BufferedReader(
 				new InputStreamReader(new GZIPInputStream(new FileInputStream(fastqFile))))) {
@@ -194,23 +409,16 @@ public class NanoporeConverter_rescue {
 			// keep track of which 'line' of the read we are on 
 			// (each read in the fastq is made up of 4 lines)
 			int idx = 0;
-			boolean skipRead = false;
-			int r1StartPos = 0, r1EndPos = 0, r2StartPos = 0;
-			String r1Sequence = "", r2Sequence = "", ogHeaderInfo = "";
-			boolean reverse = false;
-			boolean found = false;
-//			boolean firstTime = true;
+			String action = "";
+			
+			// Instantiate the barcode class
+			pBarcode barcode = new pBarcode();
 
-			// keeping track of how many reads we are missing out on
-			int n_total_reads = 0;
-			int n_skipped_reads = 0;
-			int n_ambiguous_barcode = 0;
+			String r1Sequence = "", r2Sequence = "", ogHeaderInfo = "";
+//			boolean firstTime = true;
 
 			// Keep track of how many reads we output from this fastq and add that number to the read header
 			int outReadIndex = 1;
-
-			// Instantiate the barcode class
-			pBarcode barcode = new pBarcode();
 
 			// Processing each line of the file
 			while ((line = reader.readLine()) != null) {
@@ -224,125 +432,72 @@ public class NanoporeConverter_rescue {
 				// idx == 0 is the header line
 				if (idx == 0) {
 					// We want to grab the header to save it for when we write the line to a file so that we can continue to track reads
-					ogHeaderInfo = line.substring(1);
-					n_total_reads += 1;
-					r1StartPos = 0;
-					r1EndPos = 0;
-					r2StartPos = 0;
-					found = false;
+					ogHeaderInfo = line.strip();
+					System.out.println(ogHeaderInfo);
+					incrementValue(stats, "nTotalReads");
+					action = "";
+					barcode = new pBarcode();
 				}
 
 				// idx == 1 is Sequence line
 				else if (idx == 1) {
-					reverse = false;
 					// grab the whole line here in case we skip this read. We will want to put it in the skipped fastq
 					r2Sequence = line.strip();
 
-					// Check to see if the line has the barcode pattern
-					for (String pattern : PATTERNS) {
-						Pattern compiledPattern = Pattern.compile(pattern);
-						Matcher matcher = compiledPattern.matcher(line);
-						// If we find a barcode pattern match, create a barcode object and stop looking for a match
-						if (matcher.find()) {
-							barcode = new pBarcode(matcher, line);
-							r1StartPos = matcher.start();
-							r1EndPos = matcher.end();
-							System.out.println("in first match :" + r1StartPos + "   " + r1EndPos);
-							found = true;
-							break;
-						}
-					}
+					pBarcode f_barcode = check_forward_read(line);
+					pBarcode rc_barcode = check_reverse_complement_read(line);
 
-					// if the read didn't match a barcode pattern, reverse the read and look for the barcode pattern again
-					if (!found) {
-						line = getReverseComplement(line);
-						reverse = true;
-						for (String pattern : PATTERNS) {
-							Pattern compiledPattern = Pattern.compile(pattern);
-							Matcher matcher = compiledPattern.matcher(line);
-							// If we find a barcode pattern match, create a barcode object and stop looking for a match
-							if (matcher.find()) {
-								barcode = new pBarcode(matcher, line);
-								r1StartPos = matcher.start();
-								r1EndPos = matcher.end();
-								System.out.println("in second match :" + r1StartPos + "   " + r1EndPos);
-								found = true;
-								break;
-							}
-						}
-						// if we still didn't find the barcode, change reverse back to false
-						if (!found) {
-							reverse = false;
-						}
-					}
-
-					// if we did find a barcode
-					if (found) {
-						// if the barcode isn't ambiguous (see pBarcode for meaning)
-						if (!barcode.isAmbiguous()) {
-							System.out.println("WHY IS IT NOT AMBIGUOUS NOW???");
-							System.out.println("I THINK THIS MIGHT BE DUE TO A LENGTH ISSUE");
-							System.out.println(line);
-							n_skipped_reads += 1;
-							skipRead = true;
+					action = compare_barcodes_and_determine_action(f_barcode, rc_barcode, line, stats, tier1map, tier2map, tier3map, tier4map);
+					
+					if (action != "discard") {
+						if (action == "f_barcode") {
+							barcode = f_barcode;
+						} else if (action == "rc_barcode") {
+							barcode = rc_barcode;
+							line = getReverseComplement(line);
 						} else {
-							// If the barcode is ambiguous, we want to try to rescue the barcode
-							barcode.rescueBarcode(tier1map, tier2map, tier3map, tier4map);
-							System.out.println(barcode.pBarcode);
-							
-							if(!barcode.isAmbiguous()) {
-								r2StartPos = r1EndPos + 31;
-								System.out.println("r1StartPos: " + r1StartPos + "\nr1EndPos: " + r1EndPos
-										+ "\nr2StartPos: " + r2StartPos + "\nline length: " + line.length());
-
-								// we want to make sure that we aren't trying to grab more if it isn't there
-								if (line.length() > r2StartPos + 20) {
-									// set r1 to the barcode plus the molecular index sequence
-									r1Sequence = barcode.pBarcode + line.substring(r1EndPos, r1EndPos + 15);
-
-									// if the length of the barcode and the MI sequence is less than 54, error because PIPSEEK needs it to be 54
-									if (r1Sequence.length() < 54) {
-										System.out.println(" LENGTH OF THE SEQUENCE: " + r1Sequence.length());
-										System.out.println(barcode.toString());
-										throw new Exception("ERROR: " + ogHeaderInfo + " barcode was not long enough. OG: "
-												+ line.substring(r1StartPos - 3, r1EndPos + 12) + " P: " + r1Sequence);
-									}
-
-									// get the r2 sequence
-									r2Sequence = line.substring(r2StartPos).strip();
-								} else {
-									n_skipped_reads += 1;
-									skipRead = true;
-								}
-								
-							} else {
-								n_skipped_reads += 1;
-								n_ambiguous_barcode += 1;
-								skipRead = true;
-							}
+							System.out.println("Should I even be here....");
+							throw new Exception("Action is something other than our 4 options");
 						}
-					} else {
-						// if a barcode was not found, skip the read
-						n_skipped_reads += 1;
-						skipRead = true;
+
+						// process the read
+						r1Sequence = barcode.pBarcode + line.substring(barcode.getEndIndex(), barcode.getEndIndex() + 15);
+								
+						if (r1Sequence.length() < 54) {
+							System.out.println(" LENGTH OF THE SEQUENCE: " + r1Sequence.length());
+							System.out.println(barcode.toString());
+							throw new Exception("ERROR: " + ogHeaderInfo + " barcode was not long enough. OG: "
+									+ line.substring(barcode.getStartIndex() - 3, barcode.getEndIndex() + 12) + " P: " + r1Sequence);
+						}
+
+						// Get the R2 sequence 
+						//r2Sequence = line.substring(0, barcode.getStartIndex()) + line.substring(barcode.getEndIndex() + 31).strip();	
+						r2Sequence = line.substring(barcode.getEndIndex() + 31).strip();
 					}
 				}
 
 				// idx == 3 is the quality line
 				else if (idx == 3) {
-					if (!skipRead) {
+					// add to the line header the file name the read is from and the number of the read that we are printing to the file
+					String readHeader = ogHeaderInfo + " ConvertNanoporeInfo=file_" + fileBaseName + "_read_" + outReadIndex;
+
+					if (action == "discard") {
+						// if the read is discarded for whatever reason, add the read to the discardedBuffer
+						discardedBuffer.add(readHeader);
+						discardedBuffer.add(r2Sequence);
+						discardedBuffer.add("+");
+						discardedBuffer.add(line.strip());
+						
+					} else {
 						// if the barcode was found on the reverse read, reverse the quality string
-						if (reverse) {
+						if (action == "rc_barcode") {
 							line = new StringBuilder(line).reverse().toString();
 						}
 
 						// grab the barcode quality and the rest of the line quality
 						String r1Qual = barcode.getBarcodeQualFromString(line);
-						String r2Qual = line.substring(r2StartPos).trim();
-
-						// add to the line header the file name the read is from and the number of the read that we are printing to the file
-						String readHeader = "@" + "file_" + fileBaseName + "_read_" + outReadIndex + " " + ogHeaderInfo;
-
+						//String r2Qual = line.substring(0, barcode.getStartIndex()) + line.substring(barcode.getEndIndex() + 31).trim();
+						String r2Qual = line.substring(barcode.getEndIndex() + 31).trim();
 						// Add r1 to buffer
 						r1Buffer.add(readHeader);
 						r1Buffer.add(r1Sequence);
@@ -350,6 +505,7 @@ public class NanoporeConverter_rescue {
 						r1Buffer.add(r1Qual);
 
 						// Add r2 to buffer
+						// the reversing here each time is intentional.
 						r2Buffer.add(readHeader);
 						r2Buffer.add(getReverseComplement(r2Sequence));
 						r2Buffer.add("+");
@@ -366,29 +522,27 @@ public class NanoporeConverter_rescue {
 //						}
 
 						outReadIndex += 1;
-					} else {
-						// if the read is skipped for whatever reason, add the read to the skippedBuffer
-						String readHeader = "@file_" + fileBaseName + " " + ogHeaderInfo;
-						skippedBuffer.add(readHeader);
-						skippedBuffer.add(r2Sequence);
-						skippedBuffer.add("+");
-						skippedBuffer.add(line.strip());
+						incrementValue(stats, "nTotalKeptReads");
 					}
-					skipRead = false;
 					idx = -1;
 				}
 				idx = (idx + 1) % 4;
-				if (!skippedBuffer.isEmpty() && n_skipped_reads % 5000 == 0) {
-					appendToFile(fileBaseName + "_skippedReads.fastq.dontuse.gz", String.join("\n", skippedBuffer) + "\n");
-					skippedBuffer.clear();
+				if (!discardedBuffer.isEmpty() && stats.get("nTotalDiscardedReads") % 5000 == 0) {
+					appendToFile(fileBaseName + "_discardedReads.fastq.dontuse.gz", String.join("\n", discardedBuffer) + "\n");
+					discardedBuffer.clear();
 				}
 			}
-
-			// after we are done going through all the reads, we want to add the skipped stats to their buffer
-			skippedStatsBuffer.add("Filename\tTotalReads\tSkippedReads\tAmbiguousBarcodes");
-			skippedStatsBuffer
-					.add(fileBaseName + "\t" + n_total_reads + "\t" + n_skipped_reads + "\t" + n_ambiguous_barcode);
-			System.out.println(skippedStatsBuffer);
+			// after we are done going through all the reads, we want to add the skipped stats to their buffer 
+			statsBuffer.add("Filename\tTotalReads\tTotalKeptReads\tTotalSkippedReads\tTotalDiscardedReads\tTotalTooShortReads\tnoPatternMatch\tfPatternMatch\tfUndecidedBarcode\trcPatternMatch\trcUndecidedBarcode\tbothPatternMatch\tbothBothDiscard\tbothFUndecidedBarcode\tbothRcUndecidedBarcode\tbothBothUndecidedBarcode");
+			statsBuffer.add(fileBaseName + "\t" + stats.get("nTotalReads") + "\t" + stats.get("nTotalKeptReads") + "\t" + 
+					stats.get("nTotalSkippedReads") + "\t" + stats.get("nTotalDiscardedReads") + "\t" + 
+					stats.get("nTotalTooShortReads") + "\t" + stats.get("noPatternMatch") + "\t" + 
+					stats.get("fPatternMatch") + "\t" + stats.get("fUndecidedBarcode") + "\t" + 
+					stats.get("rcPatternMatch") + "\t" + stats.get("rcUndecidedBarcode") + "\t" + 
+					stats.get("bothPatternMatch") + "\t" + stats.get("bothBothDiscard") + "\t" + 
+					stats.get("bothFUndecidedBarcode") + "\t" + stats.get("bothRcUndecidedBarcode") + "\t" + 
+					stats.get("bothBothUndecidedBarcode"));
+			System.out.println(statsBuffer);
 		} catch (IOException e) {
 			System.err.println("Error processing file: " + fastqFile.getName() + ". Error: " + e.getMessage());
 			e.printStackTrace();
@@ -403,8 +557,8 @@ public class NanoporeConverter_rescue {
 		synchronized (NanoporeConverter.class) {
 			appendToFile(r1Out, String.join("\n", r1Buffer) + "\n");
 			appendToFile(r2Out, String.join("\n", r2Buffer) + "\n");
-			appendToFile(fileBaseName + "_skippedReads.fastq.dontuse.gz", String.join("\n", skippedBuffer) + "\n");
-			appendToFile(fileBaseName + "_skippedReads.stats.gz", String.join("\n", skippedStatsBuffer) + "\n");
+			appendToFile(fileBaseName + "_discardedReads.fastq.dontuse.gz", String.join("\n", discardedBuffer) + "\n");
+			appendToFile(fileBaseName + ".stats.gz", String.join("\n", statsBuffer) + "\n");
 		}
 	}
 

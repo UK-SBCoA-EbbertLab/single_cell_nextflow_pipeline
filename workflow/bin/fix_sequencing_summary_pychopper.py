@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ## Import libraries
 import numpy as np
@@ -77,3 +77,6 @@ df_txt_final.drop(columns=["pychopper_read_id", "pychopper_sequence_length_templ
 
 ## Save new filtered sequencing summary file as a txt file
 df_txt_final.to_csv(output_name, index=False, sep="\t")
+
+## Print number of reads to stdout so it can be stored in a variable
+print(len(pychopper_read_ids_list))
