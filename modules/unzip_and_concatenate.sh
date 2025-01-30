@@ -45,7 +45,7 @@ process FIX_SEQUENCING_SUMMARY_NAME {
 
 process UNZIP_AND_CONCATENATE_WITH_FLOWCELL {
 
-    publishDir "results/${params.out_dir}/pre_processing/concatenated_fastq_and_sequencing_summary_files/", mode: 'copy', overwrite: true, pattern: "*.fastq"
+    publishDir "results/${params.out_dir}/pre_processing/concatenated_fastq_and_sequencing_summary_files/", mode: 'copy', overwrite: true, pattern: "*.fastq.gz"
     
     label "medium"
 
@@ -53,7 +53,7 @@ process UNZIP_AND_CONCATENATE_WITH_FLOWCELL {
 	tuple val(samp), val(flowcell), file(reads)
 
     output:
-	tuple val(samp), val(flowcell), path("${samp}_${flowcell}.fastq")
+	tuple val(samp), val(flowcell), path("${samp}_${flowcell}.fastq.gz")
 
     script:
     """
@@ -63,6 +63,8 @@ process UNZIP_AND_CONCATENATE_WITH_FLOWCELL {
         find . -type f -maxdepth 1 -name "*.fastq" ! -name "${samp}_${flowcell}.fastq" -exec cat {} \\; >> "${samp}_${flowcell}.fastq"
 
         find . -maxdepth 1 -type f -name "*.fastq" ! -name "${samp}_${flowcell}.fastq" -exec rm {} \\;
+
+	gzip "${samp}_${flowcell}.fastq"
     
     """
 }
