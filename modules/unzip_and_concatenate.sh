@@ -45,7 +45,7 @@ process FIX_SEQUENCING_SUMMARY_NAME {
 
 process UNZIP_AND_CONCATENATE_WITH_FLOWCELL {
 
-    publishDir "results/${params.out_dir}/pre_processing/concatenated_fastq_and_sequencing_summary_files/", mode: 'copy', overwrite: true, pattern: "*.fastq.gz"
+    publishDir "results/${params.out_dir}/pre_processing/concatenated_fastq_and_sequencing_summary_files/", mode: 'copy', overwrite: true, pattern: "*.fastq"
     
     label "medium"
 
