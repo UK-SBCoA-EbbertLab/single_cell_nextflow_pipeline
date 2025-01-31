@@ -5,11 +5,7 @@ process MAKE_CONTAMINATION_REPORT_1 {
     label 'small'
 
     input:
-        val(id)
-        val(num_reads)
-        val(num_unmapped_reads_before_chm13)
-        val(num_unmapped_reads_after_chm13)
-        val(num_contaminant_reads)
+        tuple val(id), val(num_reads), val(num_unmapped_reads_before_chm13), val(num_unmapped_reads_after_chm13), val(num_contaminant_reads)
 
     output:
         path("*.tsv")

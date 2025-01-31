@@ -6,9 +6,7 @@ process RSEQC_GENE_BODY_COVERAGE {
     label "large"
 
     input:
-        val(id)
-        path(bam)
-        path(bai)
+        tuple val(id), path(bam), path(bai)
         path(housekeeping)
 
     output:
@@ -30,9 +28,7 @@ process RSEQC_BAM_STAT {
     label "large"
 
     input:
-        val(id)
-        path(bam)
-        path(bai)
+        tuple val(id), path(bam), path(bai)
         val(mapq)
 
     output:
@@ -54,9 +50,7 @@ process RSEQC_READ_GC {
     label "large"
 
     input:
-        val(id)
-        path(bam)
-        path(bai)
+        tuple val(id), path(bam), path(bai)
         val(mapq)
 
     output:
@@ -100,9 +94,7 @@ process RSEQC_JUNCTION_ANNOTATION {
     label "large"
 
     input:
-        val(id)
-        path(bam)
-        path(bai)
+        tuple val(id), path(bam), path(bai)
         path(bed)
 
     output:
@@ -125,9 +117,7 @@ process RSEQC_JUNCTION_SATURATION {
     label "large"
 
     input:
-        val(id)
-        path(bam)
-        path(bai)
+        tuple val(id), path(bam), path(bai)
         path(bed)
 
     output:
@@ -149,9 +139,7 @@ process RSEQC_TIN {
     label "rseqc"
 
     input:
-        val(id)
-        path(bam)
-        path(bai)
+        tuple val(id), path(bam), path(bai)
         path(bed)
 
     output:
@@ -174,9 +162,7 @@ process RSEQC_READ_DISTRIBUTION {
     label "large"
 
     input:
-        val(id)
-        path(bam)
-        path(bai)
+        tuple val(id), path(bam), path(bai)
         path(bed)
 
     output:

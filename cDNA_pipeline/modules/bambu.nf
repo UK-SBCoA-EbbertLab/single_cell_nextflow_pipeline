@@ -5,10 +5,8 @@ process BAMBU_PREP {
     label 'bambu_prep_job'
 
     input:
-        val(id)
+        tuple val(id), path(bam), path(bai)
         val(mapq)
-        path(bam)
-        path(bai)
         path(ref)
         path(gtf)
         path(fai)

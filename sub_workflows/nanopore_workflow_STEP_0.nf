@@ -97,7 +97,7 @@ workflow NANOPORE_STEP_0 {
 
 		COMBINE_STATS_BY_SAMP_AND_FLOWCELL(PYCHOPPER_SC.out.num_pass_reads.groupTuple(by: [0,1]).combine(CAT_NANOPORE_CONVERT_STATS.out.groupTuple(by: [0,1]).combine(PIPSEEKER.out.pip_read_stats.groupTuple(by: [0,1]), by: [0,1]), by: [0,1]))
 
-		UNZIP_AND_CONCATENATE_WITH_FLOWCELL(PIPSEEKER.out.concat_for_bulk)
+		UNZIP_AND_CONCATENATE_WITH_FLOWCELL(PIPSEEKER.out.concat_for_bulk.groupTuple(by: [0,1]))
 		FIX_SEQUENCING_SUMMARY_NAME_WITH_FLOWCELL(seq_sum_files)
 
 		COUNT_AND_FILTER_BARCODES(PIPSEEKER.out.barcode_counts.groupTuple())
