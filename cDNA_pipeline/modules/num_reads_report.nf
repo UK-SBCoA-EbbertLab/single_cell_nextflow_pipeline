@@ -50,8 +50,9 @@ process MAKE_QC_REPORT_TRIM {
     label 'small'
 
     input:
-        tuple val(id), val(num_trimmed_fastq), val(mapq), path(json), path(flagstat_unfiltered), path(flagstat_filtered), val(num_pass_reads)
+        tuple val(id), val(num_trimmed_fastq), path(json), path(flagstat_unfiltered), path(flagstat_filtered), val(read_stats)
         val(qscore_thresh)
+	val(mapq)
 
     output:
         path("${id}_num_reads.tsv"), emit: num_reads
@@ -62,7 +63,10 @@ process MAKE_QC_REPORT_TRIM {
         """
         reads_number_fastq_all=\$(jq '.["All Reads"].basecall.reads_number' "${json}")
 
-        reads_number_fastq_pass="${num_pass_reads}"
+        reads_number_fastq_pass=\$(jq '.["0"].total_pass_reads' "${read_stats}")
+	reads_after_pychop=\$(jq '.["0"].total_after_pychop' "${read_stats}")
+	reads_after_NanoporeConvert=\$(jq '.["0"].total_after_NanoporeConvert' "${read_stats}")
+	reads_after_pipseeker=\$(jq '.["0"].total_after_pipseeker' "${read_stats}")
  
         reads_number_aligned=\$(grep "primary mapped" "${flagstat_unfiltered}" | awk '{print \$1}')
        
@@ -76,7 +80,7 @@ process MAKE_QC_REPORT_TRIM {
        
         median_read_length_alignment=\$(jq '.["All Reads"].alignment.len_percentiles[50]' "${json}")
        
-        echo "${id}\t\${reads_number_fastq_all}\t\${reads_number_fastq_pass}\t${num_trimmed_fastq}\t\${reads_number_aligned}\t\${reads_number_aligned_filtered}" > "${id}_num_reads.tsv"
+        echo "${id}\t\${reads_number_fastq_all}\t\${reads_number_fastq_pass}\t\${reads_after_pychop}\t\${reads_after_NanoporeConvert}\t\${reads_after_pipseeker}\t${num_trimmed_fastq}\t\${reads_number_aligned}\t\${reads_number_aligned_filtered}" > "${id}_num_reads.tsv"
        
         echo "${id}\t\${N50_fastq}\t\${median_read_length_fastq}\t\${N50_alignment}\t\${median_read_length_alignment}" > "${id}_read_length.tsv"
        

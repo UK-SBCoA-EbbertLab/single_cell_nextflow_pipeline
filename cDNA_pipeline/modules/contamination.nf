@@ -5,17 +5,10 @@ process MAP_CONTAMINATION_cDNA {
     label 'contamination'
 
     input:
-        val(id)
-        tuple path(bam), path(index_contaminants), path(index_chm13)
-        path(bai)
-        val(num_reads)
+        tuple val(id), path(bam), path(bai), path(index_contaminants), path(index_chm13)
 
     output:
-        val("$id"), emit: id
-        val("$num_reads"), emit: num_reads
-        env(NUM_UNMAPPED_READS_BEFORE_CHM13), emit: num_unmapped_reads_before_chm13
-        env(NUM_UNMAPPED_READS_AFTER_CHM13), emit: num_unmapped_reads_after_chm13
-        env(NUM_CONTAMINANT_READS), emit: num_contaminant_reads
+        tuple val(id), env(NUM_UNMAPPED_READS_BEFORE_CHM13), env(NUM_UNMAPPED_READS_AFTER_CHM13), env(NUM_CONTAMINANT_READS), emit: contamination_results
         path("${id}*"), emit: outty
 
     script:
