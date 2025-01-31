@@ -5,6 +5,7 @@ import glob
 import argparse
 import re
 import gzip
+import json
 
 def concat_samp_flowcell_pychopper_stats(input_folder, output_folder):
      # Find all files matching the pattern *_num_pass_reads_by_file.tsv
@@ -152,9 +153,7 @@ def main():
         print(stats_dict)
         summary_df = pd.DataFrame.from_dict(stats_dict).reset_index(drop=True)
         print(summary_df)
-        outname = f"{sampleID}_{flowcellID}_combined_stats.tsv"
-        outpath = os.path.join(args.output_folder, outname)
-        summary_df.to_csv(outpath, sep="\t", index=False)
+        summary_df.to_json(f"{sampleID}_{flowcellID}.combined_stats.json", orient="index", indent=4)
 
 
 if __name__ == "__main__":

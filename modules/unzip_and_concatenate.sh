@@ -53,7 +53,7 @@ process UNZIP_AND_CONCATENATE_WITH_FLOWCELL {
 	tuple val(samp), val(flowcell), file(reads)
 
     output:
-	tuple val(samp), val(flowcell), path("${samp}_${flowcell}.fastq.gz")
+	tuple val(samp), val(flowcell), path("${samp}_${flowcell}.fastq")
 
     script:
     """
@@ -63,8 +63,6 @@ process UNZIP_AND_CONCATENATE_WITH_FLOWCELL {
         find . -type f -maxdepth 1 -name "*.fastq" ! -name "${samp}_${flowcell}.fastq" -exec cat {} \\; >> "${samp}_${flowcell}.fastq"
 
         find . -maxdepth 1 -type f -name "*.fastq" ! -name "${samp}_${flowcell}.fastq" -exec rm {} \\;
-
-	gzip "${samp}_${flowcell}.fastq"
     
     """
 }

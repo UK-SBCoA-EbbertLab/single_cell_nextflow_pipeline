@@ -185,7 +185,7 @@ process COUNT_AND_FILTER_BARCODES {
 }
 
 process COMBINE_STATS_BY_SAMP_AND_FLOWCELL {
-	publishDir "results/${params.out_dir}/pre_processing/stats/${sampName}_${flowcellID}", mode: "copy", pattern: "*.tsv"
+	publishDir "results/${params.out_dir}/pre_processing/stats/${sampName}_${flowcellID}", mode: "copy", pattern: "*.json"
 
 	label 'small'
 
@@ -193,8 +193,7 @@ process COMBINE_STATS_BY_SAMP_AND_FLOWCELL {
 		tuple val(sampName), val(flowcellID), path(pychopper_stats), path(nc_stats), path(pipseeker_stats)
 
 	output:
-		tuple val(sampName), val(flowcellID), path("${sampName}_${flowcellID}_combined_stats.tsv")
-		path("*.tsv")
+		tuple val(sampName), val(flowcellID), path("${sampName}_${flowcellID}.combined_stats.json")
 
 	script:
 	"""
