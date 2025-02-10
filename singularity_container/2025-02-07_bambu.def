@@ -7,15 +7,16 @@ From: ebbertlab/ebbert_lab_base_environment/ebbert_lab_base_environment:sha256.4
 
 %post
     	## Install miniconda ##
-	wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-	bash Miniconda3-latest-Linux-x86_64.sh -b -f -p /opt/conda
-	rm Miniconda3-latest-Linux-x86_64.sh
+	wget https://repo.anaconda.com/miniconda/Miniconda3-py312_24.11.1-0-Linux-x86_64.sh
+	bash Miniconda3-py312_24.11.1-0-Linux-x86_64.sh -b -f -p /opt/conda
+	rm Miniconda3-py312_24.11.1-0-Linux-x86_64.sh
 
 	. /opt/conda/etc/profile.d/conda.sh
 
 	conda activate
 	conda install python=3.10.13
 	
+	echo "conda 24.11.3" >> /opt/conda/conda-meta/pinned
 
         ## Install R ##
 	sudo apt-get update
@@ -50,7 +51,7 @@ From: ebbertlab/ebbert_lab_base_environment/ebbert_lab_base_environment:sha256.4
 	Software included in the container are:
 
 	R=4.4.2
-        bambu=3.8.0
+        bambu=3.8.1
 	python=3.10.13
 
    	NOTE THAT VERSIONS OF THE SOFTWARE INSTALLED WILL CHANGE THROUGH TIME IF YOU BUILD THE IMAGE FROM THE RECIPE FILE.
