@@ -32,6 +32,8 @@ log.info """
  nanopore sequencing summary files                                              : ${params.ont_reads_txt}
  submission output file prefix                                                  : ${params.prefix}
 
+ writeable dir for pycoqc							: ${params.tmpwritedir}
+
  reference genome                                                               : ${params.ref}
  reference annotation                                                           : ${params.annotation}
  housekeeping genes 3' bias assessment                                          : ${params.housekeeping}
@@ -87,6 +89,10 @@ log.info """
  reference annotation                                                           : ${params.annotation}
  reference genome is CHM13                                                      : ${params.is_chm13}
 
+ Heberle annotation								: ${params.heberle_annotation}
+ Glinos annotation								: ${params.glinos_annotation}
+ Leung annotation								: ${params.leung_annotation}
+
  multiqc configuration file                                                     : ${params.multiqc_config}
  multiqc input path                                                             : ${params.multiqc_input} 
  intermediate qc file paths                                                     : ${params.intermediate_qc}
@@ -122,7 +128,7 @@ if (params.prefix == "None") {
     fastq_path = Channel.fromPath("${params.path}/**.fastq.gz").map{file -> tuple("sample_" + file.parent.toString().split("/")[-3] + "_" + file.simpleName.split('_')[0] + "_" + file.simpleName.split('_')[-3..-2].join("_"), file)}.groupTuple()
     txt_path = Channel.fromPath("${params.path}/**uencing_summary*.txt").map{file -> tuple("sample_" + file.parent.toString().split("/")[-2] + "_" + file.simpleName.split('_')[-3..-1].join("_"), file)}.groupTuple()
     ont_reads_fq = Channel.fromPath(params.ont_reads_fq).map { file -> tuple(file.getSimpleName(), file) }
-    ont_reads_txt = Channel.fromPath(params.ont_reads_txt).map { file -> tuple(file.baseName, file) }
+    ont_reads_txt = Channel.fromPath(params.ont_reads_txt).map { file -> tuple(file.getSimpleName(), file) }
     fast5_path = Channel.fromPath("${params.basecall_path}/**.fast5").map{file -> tuple(file.parent.toString().split("/")[-2] + "_" + file.simpleName.split('_')[0] + "_" + file.simpleName.split('_')[-3..-2].join("_"), file) }.groupTuple()
     pod5_path = Channel.fromPath("${params.basecall_path}/**.pod5").map{file -> tuple(file.parent.toString().split("/")[-2] + "_" + file.simpleName.split('_')[0] + "_" + file.simpleName.split('_')[-3..-2].join("_"), file) }.groupTuple()
     bam = Channel.fromPath(params.bam).map { file -> tuple(file.baseName, file) }
@@ -133,7 +139,7 @@ if (params.prefix == "None") {
     fastq_path = Channel.fromPath("${params.path}/**.fastq.gz").map{file -> tuple("${params.prefix}_sample_" + file.parent.toString().split("/")[-3] + "_" + file.simpleName.split('_')[0] + "_" + file.simpleName.split('_')[-3..-2].join("_"), file)}.groupTuple()
     txt_path = Channel.fromPath("${params.path}/**uencing_summary*.txt").map{file -> tuple("${params.prefix}_sample_" + file.parent.toString().split("/")[-2] + "_" + file.simpleName.split('_')[-3..-1].join("_"), file)}.groupTuple()
     ont_reads_fq = Channel.fromPath(params.ont_reads_fq).map { file -> tuple("${params.prefix}_" + file.getSimpleName(), file) }
-    ont_reads_txt = Channel.fromPath(params.ont_reads_txt).map { file -> tuple(file.baseName, file) }
+    ont_reads_txt = Channel.fromPath(params.ont_reads_txt).map { file -> tuple(file.getSimpleName(), file) }
     fast5_path = Channel.fromPath("${params.basecall_path}/**.fast5").map{file -> tuple("${params.prefix}_" + file.parent.toString().split("/")[-2] + "_" + file.simpleName.split('_')[0] + "_" + file.simpleName.split('_')[2..-2].join("_"), file) }.groupTuple()
     pod5_path = Channel.fromPath("${params.basecall_path}/**.pod5").map{file -> tuple("${params.prefix}_" +  file.parent.toString().split("/")[-2] + "_" + file.simpleName.split('_')[0] + "_" + file.simpleName.split('_')[2..-2].join("_"), file) }.groupTuple()
     bam = Channel.fromPath(params.bam).map { file -> tuple("${params.prefix}_" + file.baseName, file) }
@@ -165,9 +171,6 @@ num_reads = Channel.fromPath("${params.intermediate_qc}/number_of_reads/*")
 read_length = Channel.fromPath("${params.intermediate_qc}/read_length/*")
 quality_thresholds = Channel.fromPath("${params.intermediate_qc}/quality_score_thresholds/*")
 read_stats = Channel.fromPath("${params.read_stats}").map { file -> tuple(file.getSimpleName(), file) }
-
-read_stats.view()
-
 
 
 if (params.ercc != "None") {
@@ -224,7 +227,7 @@ workflow {
 
     else if(params.step == 3){
         
-        NANOPORE_STEP_3(ref, fai, annotation, NDR, track_reads, bambu_rds, multiqc_input, multiqc_config, contamination, num_reads, read_length, quality_thresholds)
+        NANOPORE_STEP_3(ref, fai, annotation, NDR, track_reads, bambu_rds, multiqc_input, multiqc_config, contamination, num_reads, read_length, quality_thresholds, params.heberle_annotation, params.glinos_annotation, params.leung_annotation)
     }
 
 }
