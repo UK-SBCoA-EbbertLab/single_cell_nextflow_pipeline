@@ -40,6 +40,7 @@ log.info """
  nanopore library prep kit (cDNA only)                                          : ${params.cdna_kit}
  reference genome is CHM13                                                      : ${params.is_chm13}
  path to ERCC annotations (CHM13 only)                                          : ${params.ercc}
+ Track read_ids with bambu?                                                     : ${params.track_reads}
 
  read stats from SC Step 0 (pre-processing step)				: ${params.read_stats}
  quality score threshold for fastq reads                                        : ${params.qscore_thresh}
