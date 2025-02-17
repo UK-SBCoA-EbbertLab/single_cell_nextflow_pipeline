@@ -16,16 +16,23 @@
 #SBATCH -A coa_mteb223_uksr
 
 nextflow ../../../workflow/main.nf \
-	--bambu_rds "/pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/cDNA_pipeline/submission/PBMC_patien0/results/PBMC_Patien0/bambu_prep/*.rds" \
-	--ref "/project/mteb223_uksr/sequencing_resources/references/Ensembl/hg38_release_112/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa" \
-	--fai "/pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/cDNA_pipeline/submission/PBMC_patien0/results/PBMC_Patien0/fai/Homo_sapiens.GRCh38.dna.primary_assembly.fa.fai" \
-	--annotation "/project/mteb223_uksr/sequencing_resources/annotations/Ensembl/hg38_release_112/Homo_sapiens.GRCh38.112.chr.gtf" \
+	--bambu_rds "/pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/cDNA_pipeline/submission/PBMC_patien0/STEP_2/results/PBMC_rebasecalled_bulk_discovery_FEB_10_2025_with_contamination/bambu_prep/*.rds" \
+	--ref "/project/mteb223_uksr/sequencing_resources/references/Ensembl/hg38_release_113/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa" \
+	--fai "/project/mteb223_uksr/sequencing_resources/references/Ensembl/hg38_release_113/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.fai" \
+	--annotation "/project/mteb223_uksr/sequencing_resources/annotations/Ensembl/hg38_release_113/Homo_sapiens.GRCh38.113.chr.gtf" \
 	--is_discovery "True" \
-	--track_reads "True" \
-	--multiqc_input "/pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/cDNA_pipeline/submission/PBMC_patien0/results/PBMC_Patien0/multiQC_input/**" \
-	--multiqc_config "/pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/cDNA_pipeline/workflow/bin/multiqc_config.yaml" \
-	--out_dir "PBMC_Patien0_discovery" \
+	--track_reads "False" \
+	--multiqc_input "/pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/cDNA_pipeline/submission/PBMC_patien0/STEP_2/results/PBMC_rebasecalled_bulk_discovery_FEB_10_2025_with_contamination/multiQC_input/**" \
+	--multiqc_config "/pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/cDNA_pipeline/workflow/bin/multiqc_config.yaml" \
+	--intermediate_qc "/pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/cDNA_pipeline/submission/PBMC_patien0/STEP_2/results/PBMC_rebasecalled_bulk_discovery_FEB_10_2025_with_contamination/intermediate_qc_reports/" \
+	--glinos_annotation "/pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/cDNA_pipeline/annotations/glinos_annotation_clean.gtf" \
+	--leung_annotation "/pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/cDNA_pipeline/annotations/leung_annotation_clean.gtf" \
+	--heberle_annotation "/pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/cDNA_pipeline/annotations/heberle_annotation_clean.gtf" \
+	--out_dir "PBMC_rebasecalled_bulk_discovery_FEB_11_2025_with_contamination" \
 	--step "3" \
-	--is_chm13 "False" #\
-	#-resume
+	--is_chm13 "False" \
+	-with-trace \
+	-with-timeline \
+	-with-report #\
+#	-resume
 

@@ -1,63 +1,37 @@
 process BAMBU_PREP {
 
-    publishDir "results/${params.out_dir}/", mode: "copy", overwrite: true
+    publishDir "results/${params.out_dir}/bambu_prep", mode: "copy", overwrite: true
 
     label 'bambu_prep_job'
 
     input:
-        val(id)
+        tuple val(id), path(bam), path(bai)
         val(mapq)
-        path(bam)
-        path(bai)
         path(ref)
         path(gtf)
         path(fai)
         val(track_reads)
 
     output:
-        path("bambu_prep/*.rds")
+        path("*.rds")
 
     script:
         """
-        mkdir -p bambu_prep
+	the_ids="${id}"
+	the_ids="\${the_ids//[\\[\\],]/}"
+	read -ra id_array <<< "\$the_ids"
+	    
+	for c_id in "\${id_array[@]}"; do
+	    mkdir -p bambu_prep
+	    bambu_prep.R "\${c_id}_filtered_mapq_${mapq}.bam" $ref $gtf $track_reads
+	    mv ./bambu_prep/*.rds "./bambu_prep/\${c_id}_mapq_${mapq}.rds"
+	    mv ./bambu_prep "./\${c_id}"
+	done
 
-        bambu_prep.R $bam $ref $gtf $track_reads
-        mv ./bambu_prep/*.rds './bambu_prep/${id}_mapq_${mapq}.rds'
+	mv **/*.rds .
+	
         """
 }
-
-process BAMBU_DISCOVERY {
-
-    publishDir "results/${params.out_dir}/", mode: "copy", overwrite: true
-
-    label 'huge_long'
-
-    input:
-        path(rc_files)
-        path(ref)
-        path(gtf)
-        path(fai)
-        val(NDR)
-        val(track_reads)
-        
-
-    output:
-        path("./bambu_discovery/extended_annotations.gtf"), emit:gtf
-        path("bambu_discovery/*"), emit: outty
-	path("bambu_discovery/"), emit: outdir
-
-    shell:
-        '''
-        mkdir bambu_discovery
-
-        dummy="!{rc_files}"
-
-        rc_files2="$(tr ' ' ',' <<<$dummy)"
-    
-        bambu_discovery.R $rc_files2 "!{ref}" "!{gtf}" "!{NDR}" "!{track_reads}"
-        '''
-}
-
 
 process BAMBU_QUANT {
 
@@ -73,9 +47,8 @@ process BAMBU_QUANT {
         
 
     output:
-        path("bambu_quant/*.gtf"), emit:gtf
-        path("bambu_quant/*"), emit: outty
-	//path("bambu_quant/"), emit: outdir
+	path("bambu_quant/*.txt"), emit: quant_files
+        path("bambu_quant/*"), emit: out_dir
 
     shell:
         '''
@@ -90,11 +63,8 @@ process BAMBU_QUANT {
 
         cd ./bambu_quant/
         
-        # Get the current timestamp
-        timestamp=$(date)
-
-        # Create a SHA-256 hash of the timestamp
-        hash_value=$(echo -n "$timestamp" | openssl dgst -sha256 | sed 's/SHA2-256(stdin)= //')
+        # Create a SHA-256 hash of the files
+        hash_value=$(echo -n "$dummy" | openssl dgst -sha256 | sed 's/SHA2-256(stdin)= //')
 
         # Rename each file in the directory by prepending the hash value
         for file in ./*; do

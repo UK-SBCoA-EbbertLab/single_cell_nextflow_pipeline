@@ -12,8 +12,8 @@
 time nextflow ../../../workflow/main.nf \
 	--sample_id_table "/pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/datasets/PBMC/PBMC_patient0_rebasecalled/sample_id_to_folder.tsv" \
 	--ont_reads_fq_dir "/pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/datasets/PBMC/PBMC_patient0_rebasecalled/" \
-	--out_dir "PBMC_rebasecalled_FEB_2025_update" \
-        --demultiplex_name "PBMC_rebasecalled_FEB_2025_update" \
+	--out_dir "PBMC_rebasecalled_FEB_10_2025" \
+        --demultiplex_name "PBMC_rebasecalled_FEB_10_2025" \
 	--cdna_kit "PCS114" \
 	--qscore_thresh "9" \
 	--barcode_thresh 100 \
