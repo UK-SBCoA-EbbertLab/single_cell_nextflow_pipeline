@@ -10,7 +10,7 @@ process MERGE_MATRICES {
 		path("*.txt"), emit: out
 	script:
 	"""
-		merge_matrices.py ${directory} ${name}
+		merge_matrices.py . ${name}
 	"""
 }
 

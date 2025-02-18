@@ -42,7 +42,7 @@ process GFFCOMPARE_NOVEL {
 
 process ISOLATE_NOVEL_ISOFORMS {
 
-    publishDir "results/${params.out_dir}/gffcompare/novel_isoforms_/", mode: "copy", overwrite: true
+    publishDir "results/${params.out_dir}/gffcompare/novel_isoforms/", mode: "copy", overwrite: true
 
     label 'small'
 
