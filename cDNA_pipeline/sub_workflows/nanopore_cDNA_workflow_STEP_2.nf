@@ -30,9 +30,6 @@ workflow NANOPORE_cDNA_STEP_2 {
 
     main:
 
-	ont_reads_fq.view()
-	ont_reads_txt.view()
-
         MAKE_FAI(ref)
         MAKE_INDEX_cDNA(ref)
         MINIMAP2_cDNA(ont_reads_fq, MAKE_INDEX_cDNA.out)

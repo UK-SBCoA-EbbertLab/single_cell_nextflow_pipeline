@@ -1,6 +1,6 @@
 // Import Modules
 include {BAMBU_DISCOVERY; BAMBU_QUANT} from '../modules/bambu'
-include {GFFCOMPARE} from '../modules/gffcompare'
+include {GFFCOMPARE; GFFCOMPARE_NOVEL as GFFCOMPARE_NOVEL_GLINOS ; GFFCOMPARE_NOVEL as GFFCOMPARE_NOVEL_LEUNG ; GFFCOMPARE_NOVEL as GFFCOMPARE_NOVEL_HEBERLE; ISOLATE_NOVEL_ISOFORMS} from '../modules/gffcompare'
 include {MAKE_TRANSCRIPTOME} from '../modules/make_transcriptome'
 include {MULTIQC_GRCh38} from '../modules/multiqc'
 include {MAKE_CONTAMINATION_REPORT_2} from '../modules/make_contamination_report.nf'
@@ -21,6 +21,9 @@ workflow NANOPORE_STEP_3 {
         num_reads
         read_length 
         quality_thresholds
+	heberle_annotation
+	glinos_annotation
+	leung_annotation
 
     main:
  
@@ -36,7 +39,11 @@ workflow NANOPORE_STEP_3 {
 
             BAMBU_DISCOVERY(bambu_rds.collect(), ref, annotation, fai, NDR, track_reads)
             new_annotation = BAMBU_DISCOVERY.out.gtf
+	    ISOLATE_NOVEL_ISOFORMS(new_annotation, "BambuTx")
             GFFCOMPARE(new_annotation, annotation)
+	    GFFCOMPARE_NOVEL_GLINOS(new_annotation, glinos_annotation, "Glinos_comparison", "Our_SC_novel_vs_glinos_annotation")
+	    GFFCOMPARE_NOVEL_LEUNG(new_annotation, leung_annotation, "Leung_comparison", "Our_SC_novel_vs_leung_annotation")
+	    GFFCOMPARE_NOVEL_HEBERLE(new_annotation, heberle_annotation, "Heberle_comparison", "Our_SC_novel_vs_heberle_annotation")
 
         }
 

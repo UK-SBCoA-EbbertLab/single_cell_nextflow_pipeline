@@ -15,6 +15,7 @@ process PYCOQC {
 
     script:
         """
+	export PYTHON_EGG_CACHE=${params.tmpwritedir}
 	echo ${fastq}
         num_reads_trimmed=\$(fix_sequencing_summary_pychopper.py $fastq $seq_summary "${id}_sequencing_summary_pyco.txt")
 

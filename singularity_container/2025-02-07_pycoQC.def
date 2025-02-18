@@ -5,13 +5,16 @@ From: ebbertlab/ebbert_lab_base_environment/ebbert_lab_base_environment:sha256.4
 	# seq up environment for when using the container
 	. /opt/conda/etc/profile.d/conda.sh
 	conda activate
+
+%files
+	/home/mlpa241/pycoQC_plot.py /usr/local
 	
 %post
 
     	## Install miniconda ##
-	wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-	bash Miniconda3-latest-Linux-x86_64.sh -b -f -p /opt/conda
-	rm Miniconda3-latest-Linux-x86_64.sh
+	wget https://repo.anaconda.com/miniconda/Miniconda3-py312_24.11.1-0-Linux-x86_64.sh
+	bash Miniconda3-py312_24.11.1-0-Linux-x86_64.sh -b -f -p /opt/conda
+	rm Miniconda3-py312_24.11.1-0-Linux-x86_64.sh
 
 	. /opt/conda/etc/profile.d/conda.sh
 	
@@ -19,49 +22,37 @@ From: ebbertlab/ebbert_lab_base_environment/ebbert_lab_base_environment:sha256.4
 	conda install python=3.10.13
 
 	python --version
+	conda --version
 
-	conda config --add channels bioconda
-	conda config --add channels conda-forge
-        conda config --add channels epi2melabs
-	
+	#conda config --add channels bioconda
+	#conda config --add channels conda-forge
+        #conda config --add channels epi2melabs
+
 	## Install StringTie, GFFread, GFFcompare, STAR, Salmon, SamTools, MiniMap2 ##
-        conda install -c bioconda samtools=1.19.2
+        #conda install -c bioconda gffcompare gffread samtools=1.19.2
 
 	## Install PycoQC ##
-	pip install pycoQC
+	cd /usr/local
+	git clone https://github.com/a-slide/pycoQC.git
+	mv pycoQC_plot.py pycoQC/pycoQC/pycoQC_plot.py
+	cd pycoQC
+	python setup.py install
 
-	## Install MultiQC ##
-	pip install multiqc
+	cd ../
+	rm -r pycoQC/
 
-	## Install RseQC ##
-	pip install RSeQC
-
-	## Install Trim Galore ##
-	cd /
-	apt-get update
-	sudo apt-get install -y cutadapt
-	sudo apt-get install -y fastqc
-	curl -fsSL https://github.com/FelixKrueger/TrimGalore/archive/0.6.6.tar.gz -o trim_galore.tar.gz
-	tar xvzf trim_galore.tar.gz
-	echo 'export PATH="/TrimGalore-0.6.6:$PATH"' >> $SINGULARITY_ENVIRONMENT
-
+	which pycoQC
+	
 %test
 		
 	## Check if installations are on path and/or display their versions ##
     	conda --version
 	python --version
 	pip --version
-	pycoQC --version
-	multiqc --version
-	bam2fq.py --version # RseQC
-	samtools --version
-	fastqc --version
-	cutadapt --version
-	trim_galore --version
 
 %labels
 	Author Bernardo Aguzzoli Heberle / Madeline L. Page
-	Name Single-cell pipeline Quality Control
+	Name Single-cell pipeline pycoQC
 	Version v1.0.0
 
 %help
@@ -70,14 +61,7 @@ From: ebbertlab/ebbert_lab_base_environment/ebbert_lab_base_environment:sha256.4
 
 	conda=24.11.3
 	python=3.10.13
-	pip=24.2
-	RseQC=5.0.4
 	pycoQC=v2.5.2
-	multiqc=1.26
-	fastqc=v0.11.9
-	cutadapt=3.5
-	trim_galore=0.6.6
-	samtools=1.19.2
 
    	NOTE THAT VERSIONS OF THE SOFTWARE INSTALLED WILL CHANGE THROUGH TIME IF YOU BUILD THE IMAGE FROM THE RECIPE FILE.
         TO GET THE ORIGINAL VERSION OF THIS CONTAINER PULL IT FROM THE SINGULARITY LIB. For that command and for more information about the use of this singularity container access: https://github.com/UK-SBCoA-EbbertLab/single_cell_nextflow_pipeline

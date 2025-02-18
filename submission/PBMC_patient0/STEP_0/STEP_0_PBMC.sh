@@ -10,19 +10,19 @@
 #SBATCH -A coa_mteb223_uksr
 
 time nextflow ../../../workflow/main.nf \
-	--sample_id_table "/pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/datasets/PBMC/PBMC_smallest_test/sample_id_to_folder.tsv" \
-	--ont_reads_fq_dir "/pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/datasets/PBMC/PBMC_smallest_test/" \
-	--out_dir "PBMC_patient0_smallest_test_JAN_2024" \
-        --demultiplex_name "PBMC_patient0_smallest_test_JAN_2024" \
+	--sample_id_table "/pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/datasets/PBMC/PBMC_patient0_rebasecalled/sample_id_to_folder.tsv" \
+	--ont_reads_fq_dir "/pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/datasets/PBMC/PBMC_patient0_rebasecalled/" \
+	--out_dir "PBMC_rebasecalled_FEB_10_2025" \
+        --demultiplex_name "PBMC_rebasecalled_FEB_10_2025" \
 	--cdna_kit "PCS114" \
 	--qscore_thresh "9" \
-	--barcode_thresh 10 \
+	--barcode_thresh 100 \
 	--mpldir "/scratch/mlpa241/mpl_config" \
         --step 0 \
 	-with-report \
 	-with-timeline \
-	-with-trace \
-	-resume
+	-with-trace #\
+#	-resume
 #	-with-dag \
 #	--sample_id_table "/pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/datasets/PBMC/PBMC_patient0/sample_id_to_folder.tsv" \
 #	--ont_reads_fq_dir "/pscratch/mteb223_uksr/BRENDAN_SINGLE_CELL/single_cell_nextflow_pipeline/datasets/PBMC/PBMC_patient0/" \

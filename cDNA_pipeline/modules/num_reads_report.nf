@@ -114,13 +114,8 @@ process MERGE_QC_REPORT {
         echo "# plot_type: 'table'" >> "Number_of_Reads_mqc.tsv"
         echo "# id: 'number of reads custom'" >> "Number_of_Reads_mqc.tsv" 
         echo "# section_name: 'Number of reads per sample'" >> "Number_of_Reads_mqc.tsv"
-        
-        if [ \$FIELD_COUNT -eq 5 ]; then
-            echo "Sample_ID\tAll Reads\tPass Reads\tPrimary Alignments\tFiltered Primary Alignments (MAPQ)" >> "Number_of_Reads_mqc.tsv"
-        elif [ \$FIELD_COUNT -eq 6 ]; then
-            echo "Sample_ID\tAll Reads\tPass Reads\tTrimmed & Processed Pass Reads\tPrimary Alignments\tFiltered Primary Alignments (MAPQ)" >> "Number_of_Reads_mqc.tsv"
-        fi
-        
+
+	echo "Sample_ID\tAll Reads\tPass Reads\tReads after pychopper\tReads after NanoporeConvert\tReads after Pipseeker\tTrimmed & Processed Pass Reads\tPrimary Alignments\tFiltered Primary Alignments (MAPQ)" >> "Number_of_Reads_mqc.tsv"
         cat "Number_of_Reads.tsv" >> "Number_of_Reads_mqc.tsv"
         
         echo "# plot_type: 'table'" >> "Read_Length_mqc.tsv"

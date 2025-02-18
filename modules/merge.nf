@@ -67,7 +67,7 @@ process GET_ALL_FASTQ_GZ {
 		    echo -e "\${seq_sum}" >> "\${sample_id}_\${flowcell_id}_seq_summary_file.txt"
 		    
 		    # Use find to get all .fastq.gz files in the directory
-		    find "\${full_dir_path}" -name "*.fastq.gz" | while read -r file_path; do
+		    find "\${full_dir_path}" -name "*pass*.fastq.gz" | while read -r file_path; do
 		        # Check if the file is not empty
 		        if [ -s "\${file_path}" ]; then
 		            echo -e "\${file_path}\t\${sample_id}\t\${flowcell_id}" >> all_sample_files_to_samp_id.txt
