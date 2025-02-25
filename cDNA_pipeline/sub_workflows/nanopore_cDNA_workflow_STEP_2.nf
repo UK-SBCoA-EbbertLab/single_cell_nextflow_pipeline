@@ -74,7 +74,6 @@ workflow NANOPORE_cDNA_STEP_2 {
 
         else if ((params.is_chm13 == false) && (params.housekeeping != "None"))
         {
-       	    //TODO: fix the module processed for these
             CONVERT_GTF_TO_BED12(annotation)
             RSEQC_GENE_BODY_COVERAGE(FILTER_BAM.out.bam_filtered, housekeeping)
             RSEQC_BAM_STAT(FILTER_BAM.out.bam_filtered, mapq)
