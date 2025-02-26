@@ -41,9 +41,9 @@ workflow NANOPORE_STEP_3 {
             new_annotation = BAMBU_DISCOVERY.out.gtf
 	    ISOLATE_NOVEL_ISOFORMS(new_annotation, "BambuTx")
             GFFCOMPARE(new_annotation, annotation)
-	    GFFCOMPARE_NOVEL_GLINOS(new_annotation, glinos_annotation, "Glinos_comparison", "Our_SC_novel_vs_glinos_annotation")
-	    GFFCOMPARE_NOVEL_LEUNG(new_annotation, leung_annotation, "Leung_comparison", "Our_SC_novel_vs_leung_annotation")
-	    GFFCOMPARE_NOVEL_HEBERLE(new_annotation, heberle_annotation, "Heberle_comparison", "Our_SC_novel_vs_heberle_annotation")
+	    GFFCOMPARE_NOVEL_GLINOS(new_annotation, glinos_annotation, "Glinos_comparison", "Our_SC_vs_glinos_annotation")
+	    GFFCOMPARE_NOVEL_LEUNG(new_annotation, leung_annotation, "Leung_comparison", "Our_SC_vs_leung_annotation")
+	    GFFCOMPARE_NOVEL_HEBERLE(new_annotation, heberle_annotation, "Heberle_comparison", "Our_SC_vs_heberle_annotation")
 
         }
 

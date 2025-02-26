@@ -1,0 +1,49 @@
+Bootstrap: library 
+From: ebbertlab-madeline/pip_single_cell/nanopore:sha256.a50552a9ec75d90397d8c278a03927a7ea683b7279344922b41cf695f994c8a9
+
+%environment
+	# seq up environment for when using the container
+	. /opt/conda/etc/profile.d/conda.sh
+	conda activate
+
+%post
+
+	. /opt/conda/etc/profile.d/conda.sh
+	conda activate
+	pip install polars
+
+%test
+		
+	## Check if installations are on path and/or display their versions ##
+	conda --version
+	gffread --version
+	python --version
+	pip --version
+	samtools --version
+	minimap2 --version
+	python -c "import pychopper; print(pychopper.__version__)"
+	gffcompare --version
+	porechop_abi --version
+	
+%labels
+	Author Bernardo Aguzzoli Heberle / Madeline L. Page
+	Name Single-cell pipeline Nanopore
+	Version v1.0.0
+
+%help
+
+	Software included in the container are:
+
+	conda=24.11.3
+	gffread=0.12.7
+	python=3.10.13
+	pip=25
+	samtools=1.19.2
+	minimap2=2.28-r1209
+	pychopper=2.7.10
+	gffcompare=v0.12.6
+	porechop_abi=0.5.0
+	
+   	NOTE THAT VERSIONS OF THE SOFTWARE INSTALLED WILL CHANGE THROUGH TIME IF YOU BUILD THE IMAGE FROM THE RECIPE FILE.
+        TO GET THE ORIGINAL VERSION OF THIS CONTAINER PULL IT FROM THE SINGULARITY LIB. For that command and for more information about the use of this singularity container access: https://github.com/UK-SBCoA-EbbertLab/single_cell_nextflow_pipeline
+	

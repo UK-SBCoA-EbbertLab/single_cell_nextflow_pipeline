@@ -11,3 +11,4 @@
 **/submission_scripts
 !.gitignore
 **/master_contaminant_reference.fasta
+annotations/

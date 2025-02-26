@@ -65,7 +65,7 @@ The fifth step is Step 3 - Single Cell, which runs the data through Bambu quanti
 		--bambu_rds "../STEP_2/results/PBMC_rebasecalled_bulk_discovery_FEB_10_2025_with_contamination/bambu_prep/*.rds" \
 		--ref "/path/to/sequencing_resources/references/Ensembl/hg38_release_113/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa" \
 		--fai "/path/to/sequencing_resources/references/Ensembl/hg38_release_113/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.fai" \
-		--annotation "/path/to/sequencing_resources/annotations/Ensembl/hg38_release_113/Homo_sapiens.GRCh38.113.chr.gtf" \
+		--annotation "/path/to/sequencing_resources/annotations/Ensembl/hg38_release_113/Homo_sapiens.GRCh38.113.gtf" \
 		--is_discovery "True" \
 		--track_reads "False" \
 		--multiqc_input "../STEP_2/results/PBMC_rebasecalled_bulk_discovery_FEB_10_2025_with_contamination/multiQC_input/**" \
