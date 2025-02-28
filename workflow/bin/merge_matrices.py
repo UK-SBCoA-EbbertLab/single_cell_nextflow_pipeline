@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 import sys
 import os
+os.environ["POLARS_MAX_THREADS"] = "14"
 import glob
 import polars as pl
+print(pl.thread_pool_size())
+
 
 def merge_counts(parentDirectory, fileName, columns, outfileName):
     dataframes = []

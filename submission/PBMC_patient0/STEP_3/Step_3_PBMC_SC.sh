@@ -21,6 +21,6 @@ nextflow ../../../workflow/main.nf \
 	--is_chm13 "False" \
 	-with-trace \
 	-with-timeline \
-	-with-report #\
-#	-resume
+	-with-report \
+	-resume
 
