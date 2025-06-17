@@ -116,27 +116,29 @@ if (params.ont_reads_fq != "None") {
 
 // ----- Step 3 -------------------------------------------------------------------------------------------------------------------
 
-fai = file(params.fai)
-NDR = Channel.value(params.NDR)
-track_reads = Channel.value(params.track_reads)
-bambu_rds = Channel.fromPath(params.bambu_rds)
-	.toSortedList( { a, b -> a[0] <=> b[0] } )
-	.flatten()
-	.map { file ->
-		def m = (file.name =~ /^(.*)_[ACGT]{16}_mapq_\d+\.rds$/)
-		if (!m.matches()) {
-			throw new IllegalArgumentException("Filename does not match expected pattern: ${file.name}")
+if (params.step == 3) {
+	fai = file(params.fai)
+	NDR = Channel.value(params.NDR)
+	track_reads = Channel.value(params.track_reads)
+	bambu_rds = Channel.fromPath(params.bambu_rds)
+		.toSortedList( { a, b -> a[0] <=> b[0] } )
+		.flatten()
+		.map { file ->
+			def m = (file.name =~ /^(.*)_[ACGT]{16}_mapq_\d+\.rds$/)
+			if (!m.matches()) {
+				throw new IllegalArgumentException("Filename does not match expected pattern: ${file.name}")
+			}
+			def sample = m[0][1]  // First capture group
+			tuple(sample, file)
 		}
-		def sample = m[0][1]  // First capture group
-		tuple(sample, file)
-	}
-	.groupTuple()
-	. flatMap { sample, files ->
-		files.collate(params.n_cells_process).withIndex().collect { batch , i ->
-			tuple(sample, i+1, batch)
+		.groupTuple()
+		. flatMap { sample, files ->
+			files.collate(params.n_cells_process).withIndex().collect { batch , i ->
+				tuple(sample, i+1, batch)
+			}
 		}
-	}
-
+}
+	
 // ----- Multiple steps ----------------------------------------------------------------------------------------------------------
 
 sample_id_table = params.sample_id_table
