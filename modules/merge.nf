@@ -4,13 +4,14 @@ process MERGE_MATRICES {
 	publishDir "results/${params.out_dir}/merged_bambu_matrices/", pattern: "*.txt", mode: "copy", overwrite: true
 
 	input:
-		path directory
+		tuple val(sample), path(files)
 		val name
 	output:
 		path("*.txt"), emit: out
 	script:
 	"""
-		merge_matrices.py . ${name}
+		#merge_matrices.py . ${name}
+		merge_matrices.py . ${name}_${sample} "low_memory"
 	"""
 }
 

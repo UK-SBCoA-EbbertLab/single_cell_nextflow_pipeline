@@ -40,14 +40,14 @@ process BAMBU_QUANT {
     label 'medium_small'
 
     input:
-        path(rc_files)
+        tuple val(id), val(batch), path(rc_files)
         path(ref)
         path(gtf)
         path(fai)
         
 
     output:
-	path("bambu_quant/*.txt"), emit: quant_files
+	tuple val(id), path("bambu_quant/*.txt"), emit: quant_files
         path("bambu_quant/*"), emit: out_dir
 
     shell:

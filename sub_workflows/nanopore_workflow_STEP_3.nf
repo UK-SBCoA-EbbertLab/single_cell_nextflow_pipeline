@@ -10,10 +10,15 @@ workflow NANOPORE_STEP_3 {
         annotation
         track_reads
         bambu_rds
-	n_cells_process
 
     main:
-        BAMBU_QUANT(bambu_rds.collate(n_cells_process), ref, annotation, fai)
-	MERGE_MATRICES(BAMBU_QUANT.out.quant_files.collect(), params.out_dir)
+        BAMBU_QUANT(bambu_rds, ref, annotation, fai)
+	BAMBU_QUANT.out.quant_files
+		.transpose()
+		.groupTuple()
+		.view()
+	MERGE_MATRICES(BAMBU_QUANT.out.quant_files
+		.transpose()
+		.groupTuple() , params.out_dir)
        
 }
