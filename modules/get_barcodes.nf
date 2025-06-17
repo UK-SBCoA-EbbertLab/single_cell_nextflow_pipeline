@@ -145,19 +145,28 @@ process PIPSEEKER {
 	output:
 		path("./barcodes/${sampName}_${flowcellID}_${baseName}_barcode_whitelist.txt"), emit: barcode_list
 		tuple val(sampName), val(flowcellID), path("./barcodes/${sampName}_${flowcellID}_${baseName}_generated_barcode_read_info_table.csv"), emit:barcode_counts
-		tuple val(sampName), path("./barcoded_fastqs/${sampName}_${flowcellID}_${baseName}_barcoded_1_R1.fastq.gz"), path("./barcoded_fastqs/${sampName}_${flowcellID}_${baseName}_barcoded_1_R2.fastq.gz"), emit:to_demultiplex
-		tuple val(sampName), val(flowcellID), path("./barcoded_fastqs/${sampName}_${flowcellID}_${baseName}_barcoded_1_R2.fastq.gz"), emit:concat_for_bulk
+		tuple val(sampName), path("./barcoded_fastqs/${sampName}_${flowcellID}_${baseName}_barcoded_R1.fastq.gz"), path("./barcoded_fastqs/${sampName}_${flowcellID}_${baseName}_barcoded_R2.fastq.gz"), emit:to_demultiplex
+		tuple val(sampName), val(flowcellID), path("./barcoded_fastqs/${sampName}_${flowcellID}_${baseName}_barcoded_R2.fastq.gz"), emit:concat_for_bulk
 		tuple val(sampName), val(flowcellID), path("*_num_reads_after_pipseeker.tsv"), emit:pip_read_stats
 
 	script:
 	"""
 		pipseeker barcode --verbosity 2 --skip-version-check --chemistry v4 --fastq . --output-path . 
-		mv ./barcoded_fastqs/barcoded_1_R1.fastq.gz "./barcoded_fastqs/${sampName}_${flowcellID}_${baseName}_barcoded_1_R1.fastq.gz"
-		mv ./barcoded_fastqs/barcoded_1_R2.fastq.gz "./barcoded_fastqs/${sampName}_${flowcellID}_${baseName}_barcoded_1_R2.fastq.gz"
+
+		for r1 in ./barcoded_fastqs/barcoded_*_R1.fastq.gz; do
+			r2="\${r1/R1/R2}"
+			
+			zcat \${r1} >> ./barcoded_fastqs/${sampName}_${flowcellID}_${baseName}_barcoded_R1.fastq
+			zcat \${r2} >> ./barcoded_fastqs/${sampName}_${flowcellID}_${baseName}_barcoded_R2.fastq
+		done
+
+		gzip ./barcoded_fastqs/${sampName}_${flowcellID}_${baseName}_barcoded_R1.fastq
+		gzip ./barcoded_fastqs/${sampName}_${flowcellID}_${baseName}_barcoded_R2.fastq
+
 		mv ./barcodes/generated_barcode_read_info_table.csv "./barcodes/${sampName}_${flowcellID}_${baseName}_generated_barcode_read_info_table.csv"
 		mv ./barcodes/barcode_whitelist.txt "./barcodes/${sampName}_${flowcellID}_${baseName}_barcode_whitelist.txt"
 
-		num_reads_after_pipseeker=\$(zcat "./barcoded_fastqs/${sampName}_${flowcellID}_${baseName}_barcoded_1_R2.fastq.gz" | 
+		num_reads_after_pipseeker=\$(zcat "./barcoded_fastqs/${sampName}_${flowcellID}_${baseName}_barcoded_R2.fastq.gz" | 
 			awk 'END {print NR/4}')
 		echo -e "SampName\tflowcellID\tbasename\tn_reads_after_pipseeker" > "${sampName}_${flowcellID}_${baseName}_num_reads_after_pipseeker.tsv"
 		echo -e "${sampName}\t${flowcellID}\t${baseName}\t\${num_reads_after_pipseeker}" >> "${sampName}_${flowcellID}_${baseName}_num_reads_after_pipseeker.tsv"

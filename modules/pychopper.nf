@@ -32,7 +32,7 @@ process PYCHOPPER_SC {
         echo ">MyVNP" > custom_pimers.fas
         echo "ACTTGCCTGTCGCTCTATCTTCCTCTTTCCCTACACGACGCTC" >> custom_pimers.fas
         echo ">MySSP" >> custom_pimers.fas
-        echo "TTTCTGTTGGTGCTGATATTGC" >> custom_pimers.fas
+        echo "TTTCTGTTGGTGCTGATATTGCAAGCAGTGGTATCAACGCAGAG" >> custom_pimers.fas
     fi
 
     echo -e "File\tnum_pass_reads\tnum_reads_after_pychop" > "${sampleID}_${flowcellID}_${fileNumber}_num_pass_reads_by_file.tsv"
