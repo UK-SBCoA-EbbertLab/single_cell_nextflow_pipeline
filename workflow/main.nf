@@ -116,10 +116,11 @@ if (params.ont_reads_fq != "None") {
 
 // ----- Step 3 -------------------------------------------------------------------------------------------------------------------
 
+fai = file(params.fai)
+NDR = Channel.value(params.NDR)
+track_reads = Channel.value(params.track_reads)
+
 if (params.step == 3) {
-	fai = file(params.fai)
-	NDR = Channel.value(params.NDR)
-	track_reads = Channel.value(params.track_reads)
 	bambu_rds = Channel.fromPath(params.bambu_rds)
 		.toSortedList( { a, b -> a[0] <=> b[0] } )
 		.flatten()
