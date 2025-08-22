@@ -11,3 +11,4 @@ references/
 **/report*
 **/timeline*
 **/dag*
+**/*.tsv
