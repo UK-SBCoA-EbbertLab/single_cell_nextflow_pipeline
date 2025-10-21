@@ -3,6 +3,7 @@
 This pipeline was used to prepare single-cell data, sequenced using a protocol designed in our lab, for analysis. The protocol combined ONT long-reads with PIP-seq single-cell. This pipeline was based on a pipeline developed by Bernardo Aguzzoli-Heberle and then heavily modified to fit our needs here. 
 
 Read our paper for more information about this pipeline: (https://www.biorxiv.org/content/10.1101/2025.10.16.682832v1)
+
 See this GitHub repository for the next steps in our analysis pipeline: (https://github.com/UK-SBCoA-EbbertLab/single_cell_analysis_PBMCs/tree/main)
 
 ## Steps Overview
